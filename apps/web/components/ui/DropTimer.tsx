@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 interface DropTimerProps {
   /** ISO timestamp of the next drop. */
@@ -21,9 +21,9 @@ function parts(ms: number) {
 }
 
 /**
- * Counts down to the next weekly drop (docs/product-spec.md section 7). Uses the server clock
- * offset so the timer is identical across devices; shows seconds only in the final hour, and the
- * "landing" state while the drop is being computed.
+ * Counts down to the next weekly drop (design/Main.html, docs/product-spec.md section 7). Uses the
+ * server clock offset so the timer is identical across devices; shows seconds only in the final
+ * hour, and the "landing" state while the drop is being computed.
  */
 export function DropTimer({ nextDropAt, serverNow, dropInProgress }: DropTimerProps) {
   const target = new Date(nextDropAt).getTime();
@@ -40,7 +40,7 @@ export function DropTimer({ nextDropAt, serverNow, dropInProgress }: DropTimerPr
   if (dropInProgress) {
     return (
       <div
-        className="rounded-panel border border-[#3A2C8F] px-4 py-3 text-center text-sm font-semibold text-ink-2"
+        className="rounded-[24px] border border-[#3A2C8F] px-4 py-6 text-center text-sm font-semibold text-ink-2"
         style={{ background: 'var(--grad-timer)' }}
       >
         Your week is landing…
@@ -50,31 +50,52 @@ export function DropTimer({ nextDropAt, serverNow, dropInProgress }: DropTimerPr
 
   const { days, hours, minutes, seconds } = parts(remaining);
   const lastHour = remaining <= 3600_000;
-  const tiles: Array<[string, number]> = lastHour
+  const units: Array<[string, number]> = lastHour
     ? [
-        ['H', hours],
-        ['M', minutes],
-        ['S', seconds],
+        ['Hours', hours],
+        ['Minutes', minutes],
+        ['Seconds', seconds],
       ]
     : [
-        ['D', days],
-        ['H', hours],
-        ['M', minutes],
+        ['Days', days],
+        ['Hours', hours],
+        ['Minutes', minutes],
       ];
 
   return (
     <div
-      className="flex items-center justify-center gap-2 rounded-panel border border-[#3A2C8F] px-4 py-3"
+      className="flex flex-col items-center gap-3 rounded-[24px] border border-[#3A2C8F] px-3 py-[18px]"
       style={{ background: 'var(--grad-timer)' }}
     >
-      {tiles.map(([unit, value]) => (
-        <div key={unit} className="flex min-w-14 flex-col items-center">
-          <span className="font-head text-2xl font-bold tabular-nums">
-            {String(value).padStart(2, '0')}
-          </span>
-          <span className="text-[10px] uppercase tracking-widest text-ink-3">{unit}</span>
-        </div>
-      ))}
+      <div className="font-head text-[13px] font-bold tracking-[0.08em]">NEXT DROP IN</div>
+      <div className="flex items-start gap-2">
+        {units.map(([label, value], idx) => (
+          <Fragment key={label}>
+            {idx > 0 && (
+              <div className="font-head text-2xl font-bold leading-[54px]" aria-hidden="true">
+                :
+              </div>
+            )}
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex gap-[5px]">
+                {String(value)
+                  .padStart(2, '0')
+                  .split('')
+                  .map((digit, di) => (
+                    <div
+                      key={di}
+                      className="flex h-[54px] w-11 items-center justify-center rounded-xl font-head text-[26px] font-bold tabular-nums"
+                      style={{ background: 'linear-gradient(160deg, #1F4BFF 0%, #6A3DFF 100%)' }}
+                    >
+                      {digit}
+                    </div>
+                  ))}
+              </div>
+              <div className="text-xs text-[#C7CBD6]">{label}</div>
+            </div>
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 }

@@ -68,7 +68,7 @@ export default async function PublicPass({ params }: { params: Promise<{ handle:
             .slice(0, 3)
             .map((k, i) => (
               <div key={k.label} className={cn('py-3', i > 0 && 'border-t border-divider')}>
-                <KeyNumber value={k.value} label={k.label} />
+                <KeyNumber value={k.value} label={k.label} provider={k.provider} />
               </div>
             ))}
         </section>

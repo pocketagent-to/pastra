@@ -108,7 +108,7 @@ export default async function PassScreen() {
             <div className="rounded-panel bg-panel px-4">
               {pass.keyNumbers.slice(0, 4).map((k, i) => (
                 <div key={k.label} className={cn('py-3', i > 0 && 'border-t border-divider')}>
-                  <KeyNumber value={k.value} label={k.label} />
+                  <KeyNumber value={k.value} label={k.label} provider={k.provider} />
                 </div>
               ))}
             </div>
