@@ -1,4 +1,7 @@
 import { randomInt } from 'node:crypto';
+import { sql } from 'drizzle-orm';
+import type { Database } from '@pastra/db';
+import { users } from '@pastra/db';
 
 /** Route names and other reserved words a handle may not take (docs/architecture.md section 5). */
 export const RESERVED_HANDLES = new Set([
@@ -66,4 +69,31 @@ export async function suggestHandles(
     n++;
   }
   return out;
+}
+
+/** True if no user currently holds this handle (case-insensitive). */
+export async function isHandleFree(db: Database, name: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(sql`lower(${users.handle}) = ${name.toLowerCase()}`);
+  return !row;
+}
+
+/** Check a handle for the "pick your name" step: availability, reason and up to three suggestions. */
+export async function checkHandle(
+  db: Database,
+  name: string,
+): Promise<{ available: boolean; reason?: HandleProblem; suggestions: string[] }> {
+  const valid = validateHandle(name);
+  const free = (n: string) => isHandleFree(db, n);
+  if (!valid.ok) {
+    return {
+      available: false,
+      reason: valid.reason,
+      suggestions: await suggestHandles(name, free),
+    };
+  }
+  if (await isHandleFree(db, name)) return { available: true, suggestions: [] };
+  return { available: false, reason: 'taken', suggestions: await suggestHandles(name, free) };
 }

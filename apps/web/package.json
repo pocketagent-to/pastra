@@ -10,10 +10,14 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@pastra/card": "workspace:*",
     "@pastra/catalog": "workspace:*",
     "@pastra/config": "workspace:*",
     "@pastra/core": "workspace:*",
+    "@pastra/crypto": "workspace:*",
     "@pastra/db": "workspace:*",
+    "@pastra/notify": "workspace:*",
+    "@pastra/providers": "workspace:*",
     "@pastra/scoring": "workspace:*",
     "next": "16.4.6",
     "react": "19.2.0",

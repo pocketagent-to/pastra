@@ -20,6 +20,9 @@ importers:
       prettier:
         specifier: 3.4.2
         version: 3.4.2
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -32,6 +35,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@pastra/card':
+        specifier: workspace:*
+        version: link:../../packages/card
       '@pastra/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
@@ -41,9 +47,18 @@ importers:
       '@pastra/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@pastra/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
       '@pastra/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@pastra/notify':
+        specifier: workspace:*
+        version: link:../../packages/notify
+      '@pastra/providers':
+        specifier: workspace:*
+        version: link:../../packages/providers
       '@pastra/scoring':
         specifier: workspace:*
         version: link:../../packages/scoring

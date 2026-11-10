@@ -4,10 +4,14 @@ export {
   validateHandle,
   generateFriendCode,
   suggestHandles,
+  isHandleFree,
+  checkHandle,
   RESERVED_HANDLES,
   FRIEND_CODE_ALPHABET,
   type HandleProblem,
 } from './handles';
+export { createSession, getUserByToken, deleteSession } from './sessions';
+export { currentWeek, getLiveWeek, getLivePass, getUserOffers } from './reads';
 export { buildScoringInput } from './scoring-input';
 export { recompute } from './recompute';
 export { completeConnection, syncConnection, disconnect, disconnectPreview } from './connections';

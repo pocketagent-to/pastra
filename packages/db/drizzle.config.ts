@@ -5,4 +5,7 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   casing: 'snake_case',
+  dbCredentials: {
+    url: process.env.DATABASE_URL ?? 'postgres://pastra:pastra@localhost:5432/pastra',
+  },
 });
