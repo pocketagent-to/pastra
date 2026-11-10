@@ -33,7 +33,7 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
             )}
           </div>
 
-          <PromoCode code="[PROMO-CODE]" />
+          <PromoCode code="[PROMO-CODE]" variant="box" />
 
           <div className="flex flex-col rounded-panel bg-panel px-4 py-1">
             <div className="flex min-h-12 items-center text-sm">

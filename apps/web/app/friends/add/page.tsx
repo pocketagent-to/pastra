@@ -8,7 +8,7 @@ export default function AddFriend() {
       <div className="flex min-h-full flex-col gap-[22px] pt-2">
         <section className="flex flex-col gap-3 rounded-panel border border-[#3A2C8F] p-[18px]">
           <h2 className="font-head text-[13px] font-bold tracking-[0.05em]">Your code</h2>
-          <PromoCode code="K7M3QX" />
+          <PromoCode code="K7M3QX" variant="tiles" />
           <p className="text-[13px] leading-[1.45] text-ink-2">
             Anyone with this code can add you.
           </p>

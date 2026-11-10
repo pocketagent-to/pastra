@@ -52,10 +52,11 @@ export default async function Category({ params }: { params: Promise<{ axis: str
         {unconnected.length > 0 && (
           <section className="space-y-3">
             <h2 className="font-head text-lg font-extrabold uppercase">Grow this side</h2>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-3">
               {unconnected.map((p) => (
                 <ServiceTile
                   key={p.id}
+                  variant="grow"
                   provider={p.id}
                   name={p.name}
                   state={p.status === 'coming_soon' ? 'coming_soon' : 'connect'}
