@@ -1,0 +1,527 @@
+[
+ {
+  "file": "SignUp",
+  "title": "A1 · Sign up",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CheckEmail",
+  "title": "A2 · Check your email",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "ChooseHandle",
+  "title": "A3 · Pick your name",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "ChooseHandleTaken",
+  "title": "A4 · Pick your name — taken",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "FirstConnect",
+  "title": "A5 · First service",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "ConnectConsent",
+  "title": "A6 · Connect — consent",
+  "width": 390,
+  "height": 846,
+  "interactive": true
+ },
+ {
+  "file": "RedirectProvider",
+  "title": "A7 · Handoff to a service",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Building",
+  "title": "A8 · Building the pass",
+  "width": 390,
+  "height": 880,
+  "interactive": true
+ },
+ {
+  "file": "SteamPrivate",
+  "title": "A9 · Steam — private profile",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Reveal",
+  "title": "A10 · Reveal",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Login",
+  "title": "A11 · Log in",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Recover",
+  "title": "A12 · Recover access",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Main",
+  "title": "B1 · Pass",
+  "width": 390,
+  "height": 1360,
+  "interactive": true
+ },
+ {
+  "file": "PassEmpty",
+  "title": "B2 · Pass — empty",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Category",
+  "title": "B3 · Side detail",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CategoryEmpty",
+  "title": "B4 · Side — empty",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Stamps",
+  "title": "B5 · Stamps",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Recap",
+  "title": "B6 · Weekly recap",
+  "width": 390,
+  "height": 892,
+  "interactive": true
+ },
+ {
+  "file": "Share",
+  "title": "B7 · Share",
+  "width": 390,
+  "height": 848,
+  "interactive": true
+ },
+ {
+  "file": "ShareDone",
+  "title": "B8 · Share — done",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Public",
+  "title": "B9 · Public pass",
+  "width": 390,
+  "height": 1039,
+  "interactive": true
+ },
+ {
+  "file": "PassPrivate",
+  "title": "B10 · Public pass — private",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "NotFound",
+  "title": "B11 · Page not found",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Services",
+  "title": "C1 · Services",
+  "width": 390,
+  "height": 1396,
+  "interactive": true
+ },
+ {
+  "file": "ServiceDetail",
+  "title": "C2 · Service — connected",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "ServiceError",
+  "title": "C3 · Service — reconnect needed",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "HealthConsent",
+  "title": "C4 · Connect — health consent",
+  "width": 390,
+  "height": 946,
+  "interactive": true
+ },
+ {
+  "file": "WalletSign",
+  "title": "C5 · Wallet signature",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "AlreadyLinked",
+  "title": "C6 · Service — already on another pass",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "DisconnectConfirm",
+  "title": "C7 · Disconnect a service",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Offers",
+  "title": "D1 · Offers",
+  "width": 390,
+  "height": 1085,
+  "interactive": true
+ },
+ {
+  "file": "OffersConsent",
+  "title": "D2 · Offers — turn on personal offers",
+  "width": 390,
+  "height": 877,
+  "interactive": true
+ },
+ {
+  "file": "OffersEmpty",
+  "title": "D3 · Offers — empty week",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "OfferDetail",
+  "title": "D4 · Offer — promo code",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "OfferCashback",
+  "title": "D5 · Offer — cashback",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "OfferStates",
+  "title": "D6 · Offer — cashback states",
+  "width": 390,
+  "height": 1146,
+  "interactive": false
+ },
+ {
+  "file": "Friends",
+  "title": "E1 · Friends",
+  "width": 390,
+  "height": 1252,
+  "interactive": true
+ },
+ {
+  "file": "FriendsEmpty",
+  "title": "E2 · Friends — empty",
+  "width": 390,
+  "height": 900,
+  "interactive": true
+ },
+ {
+  "file": "AddFriend",
+  "title": "E3 · Add a friend by code",
+  "width": 390,
+  "height": 872,
+  "interactive": true
+ },
+ {
+  "file": "FriendProfile",
+  "title": "E4 · Friend profile",
+  "width": 390,
+  "height": 1033,
+  "interactive": true
+ },
+ {
+  "file": "Compare",
+  "title": "E5 · Compare",
+  "width": 390,
+  "height": 1196,
+  "interactive": true
+ },
+ {
+  "file": "Card",
+  "title": "F1 · Card — get the card",
+  "width": 390,
+  "height": 951,
+  "interactive": true
+ },
+ {
+  "file": "CardJoined",
+  "title": "F2 · Card — not in your country yet",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CardKyc",
+  "title": "F3 · Card — verify identity",
+  "width": 390,
+  "height": 1017,
+  "interactive": true
+ },
+ {
+  "file": "CardKycStatus",
+  "title": "F4 · Card — verification states",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CardHome",
+  "title": "F5 · Card — active",
+  "width": 390,
+  "height": 1130,
+  "interactive": true
+ },
+ {
+  "file": "CardFrozen",
+  "title": "F6 · Card — frozen",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CardTopUp",
+  "title": "F7 · Card — top up",
+  "width": 390,
+  "height": 1109,
+  "interactive": true
+ },
+ {
+  "file": "CardWithdraw",
+  "title": "F8 · Card — withdraw",
+  "width": 390,
+  "height": 1017,
+  "interactive": true
+ },
+ {
+  "file": "CardWithdrawStatus",
+  "title": "F9 · Card — withdrawal states",
+  "width": 390,
+  "height": 844,
+  "interactive": false
+ },
+ {
+  "file": "CardDetails",
+  "title": "F10 · Card — details",
+  "width": 390,
+  "height": 1023,
+  "interactive": true
+ },
+ {
+  "file": "CardRevealConfirm",
+  "title": "F11 · Card — confirm to show number",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Card3ds",
+  "title": "F12 · Card — approve online payment",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CardCashback",
+  "title": "F13 · Card — cashback",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "CardClose",
+  "title": "F14 · Card — close",
+  "width": 390,
+  "height": 865,
+  "interactive": true
+ },
+ {
+  "file": "Settings",
+  "title": "G1 · Settings",
+  "width": 390,
+  "height": 1002,
+  "interactive": true
+ },
+ {
+  "file": "EditProfile",
+  "title": "G2 · Edit profile",
+  "width": 390,
+  "height": 1366,
+  "interactive": true
+ },
+ {
+  "file": "LoginMethods",
+  "title": "G3 · Sign-in methods",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "DeleteConfirm",
+  "title": "G4 · Delete account",
+  "width": 390,
+  "height": 844,
+  "interactive": true
+ },
+ {
+  "file": "Terms",
+  "title": "G5 · Terms (draft)",
+  "width": 390,
+  "height": 1060,
+  "interactive": true
+ },
+ {
+  "file": "Privacy",
+  "title": "G6 · Privacy (draft)",
+  "width": 390,
+  "height": 1236,
+  "interactive": true
+ },
+ {
+  "file": "ErrorState",
+  "title": "G7 · Errors — load and sync",
+  "width": 390,
+  "height": 895,
+  "interactive": true
+ },
+ {
+  "file": "Toasts",
+  "title": "G8 · Toasts",
+  "width": 390,
+  "height": 854,
+  "interactive": false
+ },
+ {
+  "file": "ShareCard",
+  "title": "Share image — pass 1200×675",
+  "width": 1200,
+  "height": 675,
+  "interactive": false
+ },
+ {
+  "file": "ShareCompareCard",
+  "title": "Share image — comparison",
+  "width": 1200,
+  "height": 675,
+  "interactive": false
+ },
+ {
+  "file": "ShareWeekCard",
+  "title": "Share image — my week",
+  "width": 1200,
+  "height": 675,
+  "interactive": false
+ },
+ {
+  "file": "ShareSquare",
+  "title": "Share image — square 1080",
+  "width": 1080,
+  "height": 1080,
+  "interactive": false
+ },
+ {
+  "file": "ShareStory",
+  "title": "Share image — story 1080×1920",
+  "width": 1080,
+  "height": 1920,
+  "interactive": false
+ },
+ {
+  "file": "AdminOffers",
+  "title": "Admin — offers",
+  "width": 1280,
+  "height": 700,
+  "interactive": true
+ },
+ {
+  "file": "AdminOfferEdit",
+  "title": "Admin — edit offer",
+  "width": 1280,
+  "height": 1084,
+  "interactive": true
+ },
+ {
+  "file": "LogoA",
+  "title": "Logo A — Shape (chosen)",
+  "width": 640,
+  "height": 360,
+  "interactive": false
+ },
+ {
+  "file": "LogoB",
+  "title": "Logo B — Monogram",
+  "width": 640,
+  "height": 360,
+  "interactive": false
+ },
+ {
+  "file": "LogoC",
+  "title": "Logo C — Stamp",
+  "width": 640,
+  "height": 360,
+  "interactive": false
+ },
+ {
+  "file": "LogoD",
+  "title": "Logo D — Six parts",
+  "width": 640,
+  "height": 360,
+  "interactive": false
+ },
+ {
+  "file": "Landing",
+  "title": "Landing — separate project, not an app screen",
+  "width": 390,
+  "height": 1480,
+  "interactive": true
+ }
+]

@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+coverage
+apps/web/.next
+design
+docs
+pnpm-lock.yaml
+apps/web/public

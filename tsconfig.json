@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["node"],
+    "paths": {
+      "@pastra/config": ["packages/config/src/index.ts"],
+      "@pastra/config/*": ["packages/config/src/*"],
+      "@pastra/catalog": ["packages/catalog/src/index.ts"],
+      "@pastra/catalog/*": ["packages/catalog/src/*"],
+      "@pastra/scoring": ["packages/scoring/src/index.ts"],
+      "@pastra/scoring/*": ["packages/scoring/src/*"]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts"],
+  "exclude": ["node_modules", "**/dist/**", "apps/**"]
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": "../..",
+    "paths": {
+      "@pastra/config": ["packages/config/src/index.ts"],
+      "@pastra/catalog": ["packages/catalog/src/index.ts"],
+      "@pastra/scoring": ["packages/scoring/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}
