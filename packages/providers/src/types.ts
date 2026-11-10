@@ -23,6 +23,8 @@ export interface BeginContext {
   state: string;
   /** For wallet signatures: a one-time nonce to embed in the message. */
   nonce?: string;
+  /** For PKCE (RFC 7636): the S256 code challenge; the verifier is stored server-side. */
+  codeChallenge?: string;
 }
 
 export interface CompleteContext {

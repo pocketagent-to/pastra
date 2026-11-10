@@ -88,6 +88,30 @@ export const configSchema = z.object({
   STEAM_WEB_API_KEY: z.string().default(''),
   X_DAILY_SPEND_CAP: z.string().default(''),
   APPLE_MUSIC_KEY: z.string().default(''),
+
+  // OAuth client credentials, one pair per service adapter (docs/architecture.md section 7).
+  // Empty => the registry falls back to the stub adapter for that provider.
+  TWITCH_CLIENT_ID: z.string().default(''),
+  TWITCH_CLIENT_SECRET: z.string().default(''),
+  LICHESS_CLIENT_ID: z.string().default(''),
+  X_CLIENT_ID: z.string().default(''),
+  X_CLIENT_SECRET: z.string().default(''),
+  DISCORD_CLIENT_ID: z.string().default(''),
+  DISCORD_CLIENT_SECRET: z.string().default(''),
+  GITHUB_CLIENT_ID: z.string().default(''),
+  GITHUB_CLIENT_SECRET: z.string().default(''),
+  TIDAL_CLIENT_ID: z.string().default(''),
+  TIDAL_CLIENT_SECRET: z.string().default(''),
+  GOOGLE_CLIENT_ID: z.string().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().default(''),
+  ANILIST_CLIENT_ID: z.string().default(''),
+  ANILIST_CLIENT_SECRET: z.string().default(''),
+  POLAR_CLIENT_ID: z.string().default(''),
+  POLAR_CLIENT_SECRET: z.string().default(''),
+  WHOOP_CLIENT_ID: z.string().default(''),
+  WHOOP_CLIENT_SECRET: z.string().default(''),
+  OURA_CLIENT_ID: z.string().default(''),
+  OURA_CLIENT_SECRET: z.string().default(''),
 });
 
 export type Config = z.infer<typeof configSchema>;

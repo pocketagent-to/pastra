@@ -12,6 +12,8 @@ export type {
 } from './types';
 export { makeStubAdapter, authKindFor } from './stub';
 export { AdapterRegistry, buildRegistry, assertCatalogCoverage } from './registry';
+export { httpJson, httpForm, bearer, pkcePair, randomToken, type HttpOptions } from './http';
+export { createOAuth2Adapter, type OAuth2Config } from './oauth2';
 export {
   createEvmWalletAdapter,
   buildWalletMessage,
