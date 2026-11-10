@@ -1,6 +1,7 @@
 import { getConfig } from '@pastra/config';
 import { Logo } from '@/components/brand/Logo';
-import { PrimaryButton, OutlineButton } from '@/components/ui/Button';
+import { OutlineButton } from '@/components/ui/Button';
+import { PrivyLogin } from '@/components/auth/PrivyLogin';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,24 +27,19 @@ export default function SignUp() {
       </div>
 
       <div className="w-full max-w-xs space-y-3">
-        {devLogin ? (
+        {privyConfigured ? (
+          <PrivyLogin />
+        ) : (
+          <p className="text-sm text-ink-3">Sign-in is not configured yet.</p>
+        )}
+        {devLogin && (
           <>
-            <PrimaryButton href="/api/auth/dev-login?handle=nomad">
-              Dev sign-in as nomad
-            </PrimaryButton>
+            <div className="py-1 text-xs uppercase tracking-widest text-ink-3">or dev sign-in</div>
+            <OutlineButton href="/api/auth/dev-login?handle=nomad">Dev: nomad</OutlineButton>
             <OutlineButton href="/api/auth/dev-login?handle=newplayer">
               Dev: new account
             </OutlineButton>
-            {privyConfigured && (
-              <p className="text-xs text-ink-3">
-                Privy is configured — wire the client (see README).
-              </p>
-            )}
           </>
-        ) : (
-          <p className="text-sm text-ink-3">
-            Sign in with Privy (email or Google). Enable the client per the README.
-          </p>
         )}
       </div>
 

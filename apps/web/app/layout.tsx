@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { inter, unbounded } from '@/lib/fonts';
+import { Providers } from '@/components/auth/Providers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${unbounded.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Providers appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}>{children}</Providers>
+      </body>
     </html>
   );
 }
