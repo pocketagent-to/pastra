@@ -1,23 +1,59 @@
-import { getConfig } from '@pastra/config';
-import { catalog } from '@pastra/catalog';
+import { PgBoss } from 'pg-boss';
+import { addWeeks, currentWeek } from '@pastra/core';
+import { createDeps } from './deps';
+import { runDrop } from './drop-chain';
 
-/**
- * Background worker entry point (docs/architecture.md section 2). Long-running and scheduled work
- * (the weekly drop chain, per-service syncs) lands here from stage 5 onward. For now it validates
- * config and the catalog at boot so misconfiguration fails fast.
- */
-function main(): void {
-  const config = getConfig();
-  console.log(
-    `[worker] started · env=${config.NODE_ENV} · card=${config.CARD_PROVIDER} · providers=${catalog.providers.length}`,
-  );
+const DROP_QUEUE = 'drop.run';
 
-  const shutdown = (signal: string): void => {
-    console.log(`[worker] ${signal} received, shutting down`);
-    process.exit(0);
-  };
-  process.on('SIGINT', () => shutdown('SIGINT'));
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
+function log(message: string): void {
+  console.log(`[worker] ${message}`);
 }
 
-main();
+/** Compute the parameters for the drop happening now: the new live week and the one it closes. */
+function dropParams(now: Date = new Date()) {
+  const week = currentWeek(now);
+  return { week, prevWeek: addWeeks(week, -1), dropAt: now };
+}
+
+async function main(): Promise<void> {
+  const deps = createDeps();
+  log(
+    `starting · env=${deps.config.NODE_ENV} · card=${deps.config.CARD_PROVIDER} · providers=${deps.catalog.providers.length}`,
+  );
+
+  // One-shot manual drop for staging: `pnpm --filter @pastra/worker start drop`.
+  if (process.argv[2] === 'drop') {
+    const result = await runDrop(deps, dropParams());
+    log(`drop complete · users=${result.users} connections=${result.connections}`);
+    process.exit(0);
+  }
+
+  const boss = new PgBoss(deps.config.DATABASE_URL);
+  boss.on('error', (error: unknown) => log(`pg-boss error: ${(error as Error).message}`));
+  await boss.start();
+  await boss.createQueue(DROP_QUEUE);
+
+  await boss.work(DROP_QUEUE, async (jobs: unknown[]) => {
+    for (const _job of jobs) {
+      const result = await runDrop(deps, dropParams());
+      log(`drop published · users=${result.users} connections=${result.connections}`);
+    }
+  });
+
+  // Schedule the weekly drop (Monday 13:00 Europe/Warsaw by default, docs/architecture.md section 9).
+  await boss.schedule(DROP_QUEUE, deps.config.DROP_CRON, {}, { tz: deps.config.DROP_TZ });
+  log(`scheduled drop · cron="${deps.config.DROP_CRON}" tz=${deps.config.DROP_TZ}`);
+
+  const shutdown = async (signal: string): Promise<void> => {
+    log(`${signal} received, stopping`);
+    await boss.stop({ graceful: true });
+    process.exit(0);
+  };
+  process.on('SIGINT', () => void shutdown('SIGINT'));
+  process.on('SIGTERM', () => void shutdown('SIGTERM'));
+}
+
+main().catch((error) => {
+  log(`fatal: ${(error as Error).message}`);
+  process.exit(1);
+});

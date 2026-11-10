@@ -88,6 +88,10 @@ export async function publishDrop(
   }
 
   await db.transaction(async (tx) => {
+    // Idempotent promote: drop any existing live snapshot for this week, then flip the drafts live.
+    await tx
+      .delete(passSnapshots)
+      .where(and(eq(passSnapshots.week, week), eq(passSnapshots.state, 'live')));
     await tx
       .update(passSnapshots)
       .set({ state: 'live' })

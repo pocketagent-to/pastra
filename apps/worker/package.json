@@ -10,9 +10,16 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@pastra/card": "workspace:*",
     "@pastra/catalog": "workspace:*",
     "@pastra/config": "workspace:*",
-    "@pastra/scoring": "workspace:*"
+    "@pastra/core": "workspace:*",
+    "@pastra/crypto": "workspace:*",
+    "@pastra/db": "workspace:*",
+    "@pastra/notify": "workspace:*",
+    "@pastra/providers": "workspace:*",
+    "@pastra/scoring": "workspace:*",
+    "pg-boss": "12.38.1"
   },
   "devDependencies": {
     "tsx": "4.23.15"
