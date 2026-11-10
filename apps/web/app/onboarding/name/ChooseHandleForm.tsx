@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { PrimaryButton } from '@/components/ui/Button';
 
 interface CheckResult {
@@ -15,11 +16,21 @@ const REASON_TEXT: Record<string, string> = {
   reserved: 'That name is reserved.',
 };
 
+const SUBMIT_ERROR_TEXT: Record<string, string> = {
+  handle_taken: 'That name is taken.',
+  handle_invalid: '3–20 characters, lowercase letters, digits or underscore.',
+  handle_reserved: 'That name is reserved.',
+  forbidden: 'You can only change your name once every 30 days.',
+};
+
 /** A3/A4 · Pick your name — availability checked as you type (docs/product-spec.md section 12). */
 export function ChooseHandleForm() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (name.length < 3) {
@@ -39,6 +50,33 @@ export function ChooseHandleForm() {
     }, 300);
     return () => clearTimeout(id);
   }, [name]);
+
+  /** Persist the handle, then advance to the first-service step. */
+  async function claim() {
+    if (!result?.available || submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch('/api/me/handle', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        router.push('/start');
+        router.refresh();
+        return;
+      }
+      const data = (await res.json().catch(() => ({}))) as { error?: { code?: string } };
+      setSubmitError(
+        SUBMIT_ERROR_TEXT[data.error?.code ?? ''] ?? 'Could not save your name. Try again.',
+      );
+      setSubmitting(false);
+    } catch {
+      setSubmitError('Network error. Try again.');
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -75,8 +113,10 @@ export function ChooseHandleForm() {
         </div>
       )}
 
-      <PrimaryButton href={result?.available ? '/start' : undefined} disabled={!result?.available}>
-        Continue
+      {submitError && <p className="text-xs text-orange-light">{submitError}</p>}
+
+      <PrimaryButton type="button" onClick={claim} disabled={!result?.available || submitting}>
+        {submitting ? 'Saving…' : 'Continue'}
       </PrimaryButton>
     </div>
   );
