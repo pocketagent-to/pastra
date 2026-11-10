@@ -32,6 +32,13 @@ export const configSchema = z.object({
 
   // Core
   APP_URL: z.url().default('http://localhost:3000'),
+
+  // Auth — Privy is the login and embedded-wallet provider (docs/architecture.md section 11.1).
+  PRIVY_APP_ID: z.string().default(''),
+  PRIVY_APP_SECRET: z.string().default(''),
+  // A development-only sign-in shortcut; never enabled in production.
+  DEV_LOGIN_ENABLED: boolish(false),
+
   DATABASE_URL: z.string().min(1).default('postgres://pastra:pastra@localhost:5432/pastra'),
   SESSION_SECRET: z.string().min(1).default('dev-session-secret-change-me'),
   TOKEN_ENC_KEYS: z.string().min(1).default('v1:00000000000000000000000000000000000000000000'),

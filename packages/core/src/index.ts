@@ -11,7 +11,18 @@ export {
   type HandleProblem,
 } from './handles';
 export { createSession, getUserByToken, deleteSession } from './sessions';
-export { currentWeek, getLiveWeek, getLivePass, getUserOffers } from './reads';
+export { loginWithIdentity, claimHandle, type IdentityKind } from './auth';
+export {
+  currentWeek,
+  getLiveWeek,
+  getLivePass,
+  getUserOffers,
+  getUser,
+  getUserByHandle,
+  getVisibility,
+  getUserStamps,
+  getUserConnections,
+} from './reads';
 export { buildScoringInput } from './scoring-input';
 export { recompute } from './recompute';
 export { completeConnection, syncConnection, disconnect, disconnectPreview } from './connections';

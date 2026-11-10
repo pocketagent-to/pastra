@@ -1,6 +1,14 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { Database } from '@pastra/db';
-import { passSnapshots, userOffers, weeks } from '@pastra/db';
+import {
+  connections,
+  passSnapshots,
+  stamps,
+  userOffers,
+  users,
+  visibility,
+  weeks,
+} from '@pastra/db';
 import { isoWeekString } from './weeks';
 
 /** The current week string (UTC). */
@@ -35,4 +43,34 @@ export async function getUserOffers(db: Database, userId: string, week: string) 
     .select()
     .from(userOffers)
     .where(and(eq(userOffers.userId, userId), eq(userOffers.week, week)));
+}
+
+/** A user by id. */
+export async function getUser(db: Database, userId: string) {
+  const [row] = await db.select().from(users).where(eq(users.id, userId));
+  return row ?? null;
+}
+
+/** A user by handle (case-insensitive is enforced by the unique index; exact match here). */
+export async function getUserByHandle(db: Database, handle: string) {
+  const [row] = await db.select().from(users).where(eq(users.handle, handle.toLowerCase()));
+  return row ?? null;
+}
+
+/** Per-axis visibility map for a user (defaults applied by the caller). */
+export async function getVisibility(db: Database, userId: string) {
+  return db.select().from(visibility).where(eq(visibility.userId, userId));
+}
+
+/** A user's current (non-revoked) stamps. */
+export async function getUserStamps(db: Database, userId: string) {
+  return db
+    .select()
+    .from(stamps)
+    .where(and(eq(stamps.userId, userId), isNull(stamps.revokedAt)));
+}
+
+/** A user's connections. */
+export async function getUserConnections(db: Database, userId: string) {
+  return db.select().from(connections).where(eq(connections.userId, userId));
 }

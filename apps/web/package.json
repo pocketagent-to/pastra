@@ -21,7 +21,9 @@
     "@pastra/scoring": "workspace:*",
     "next": "16.4.6",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "@privy-io/server-auth": "1.32.5",
+    "@privy-io/react-auth": "3.51.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.5",

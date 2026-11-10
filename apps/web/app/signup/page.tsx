@@ -1,11 +1,20 @@
+import { getConfig } from '@pastra/config';
 import { Logo } from '@/components/brand/Logo';
 import { PrimaryButton, OutlineButton } from '@/components/ui/Button';
 
+export const dynamic = 'force-dynamic';
+
 /**
- * Sign up (A1). Two methods only — Google and email magic link (docs/product-spec.md section 4).
- * This is the layout; the auth wiring lands in stage 3. Continuing accepts Terms and Privacy.
+ * Sign up (A1). Real sign-in is Privy (email + Google) which also provisions the embedded wallet
+ * (docs/architecture.md section 11.1). The server side (/api/auth/privy) is wired; the client
+ * provider is activated once Privy keys are added (see README "Enabling Privy"). In development a
+ * gated dev-login shortcut is used for end-to-end testing.
  */
 export default function SignUp() {
+  const config = getConfig();
+  const privyConfigured = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
+  const devLogin = config.DEV_LOGIN_ENABLED && config.NODE_ENV === 'development';
+
   return (
     <main className="app-shell flex min-h-dvh flex-col items-center justify-center gap-8 px-6 text-center">
       <Logo size={56} />
@@ -17,8 +26,25 @@ export default function SignUp() {
       </div>
 
       <div className="w-full max-w-xs space-y-3">
-        <PrimaryButton href="/api/auth/google/begin">Continue with Google</PrimaryButton>
-        <OutlineButton href="/login/email">Continue with email</OutlineButton>
+        {devLogin ? (
+          <>
+            <PrimaryButton href="/api/auth/dev-login?handle=nomad">
+              Dev sign-in as nomad
+            </PrimaryButton>
+            <OutlineButton href="/api/auth/dev-login?handle=newplayer">
+              Dev: new account
+            </OutlineButton>
+            {privyConfigured && (
+              <p className="text-xs text-ink-3">
+                Privy is configured — wire the client (see README).
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-ink-3">
+            Sign in with Privy (email or Google). Enable the client per the README.
+          </p>
+        )}
       </div>
 
       <p className="max-w-xs text-xs text-ink-3">
