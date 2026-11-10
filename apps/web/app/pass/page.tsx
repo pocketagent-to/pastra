@@ -78,7 +78,7 @@ export default async function PassScreen() {
           className="flex flex-col items-center gap-2.5 rounded-panel p-4"
           style={{ background: 'radial-gradient(85% 60% at 50% 40%, #22359E 0%, #16171B 78%)' }}
         >
-          <Hexagon values={values} hidden={hidden} size={300} />
+          <Hexagon values={values} hidden={hidden} size={300} linkAxes />
           <Link
             href="/pass/recap"
             className="flex w-full items-center gap-2.5 rounded-[14px] bg-status px-3.5 py-2.5 text-[#04130A] shadow-[0_0_18px_rgba(46,204,113,0.45)]"
