@@ -9,6 +9,7 @@
       "@pastra/scoring": ["packages/scoring/src/index.ts"],
       "@pastra/crypto": ["packages/crypto/src/index.ts"],
       "@pastra/db": ["packages/db/src/index.ts"],
+      "@pastra/db/*": ["packages/db/src/*"],
       "@pastra/card": ["packages/card/src/index.ts"],
       "@pastra/providers": ["packages/providers/src/index.ts"],
       "@pastra/notify": ["packages/notify/src/index.ts"],
