@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PrimaryButton } from '@/components/ui/Button';
 
 interface CheckResult {
   available: boolean;
@@ -78,46 +77,105 @@ export function ChooseHandleForm() {
     }
   }
 
+  const available = result?.available === true;
+  const unavailable = result != null && !loading && !result.available;
+  const inputBorder =
+    result && !loading
+      ? result.available
+        ? 'border-green'
+        : 'border-[#FF8A7A]'
+      : 'border-[#4A4E5A]';
+  const canContinue = Boolean(result?.available) && !submitting;
+
   return (
-    <div className="space-y-4">
-      <div>
-        <div className="flex items-center rounded-button border border-divider bg-panel px-3">
-          <span className="text-ink-3">@</span>
+    <div className="flex flex-1 flex-col gap-[22px]">
+      <div className="flex flex-col gap-2.5">
+        <label htmlFor="handle" className="text-[13px] font-semibold text-ink-2">
+          Name
+        </label>
+        <div
+          className={`flex h-[54px] items-center rounded-button border-[1.5px] bg-panel px-4 ${inputBorder}`}
+        >
+          <span className="whitespace-nowrap text-[15px] text-ink-3">[your-domain]/</span>
           <input
+            id="handle"
             value={name}
             onChange={(e) => setName(e.target.value.toLowerCase())}
             placeholder="yourname"
-            className="w-full bg-transparent p-3 outline-none"
+            autoComplete="off"
+            className="h-full min-w-0 flex-grow bg-transparent text-[15px] font-semibold text-ink outline-none"
             autoFocus
           />
         </div>
-        {result && !loading && (
-          <p className={`mt-1 text-xs ${result.available ? 'text-green' : 'text-orange-light'}`}>
-            {result.available ? 'Available' : REASON_TEXT[result.reason ?? 'invalid']}
-          </p>
+        {result && !loading && available && (
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-green">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="shrink-0"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+            {name} is free
+          </div>
         )}
+        {unavailable && (
+          <div className="text-[13px] font-semibold text-[#FF8A7A]">
+            {result.reason === 'taken'
+              ? `${name} is taken. Pick one below or try another.`
+              : REASON_TEXT[result.reason ?? 'invalid']}
+          </div>
+        )}
+        <div className="text-[13px] leading-relaxed text-ink-3">
+          3 to 20 characters: a to z, 0 to 9 and underscore.
+        </div>
       </div>
 
-      {result && !result.available && result.suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {result.suggestions.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setName(s)}
-              className="rounded-chip border border-divider bg-white/5 px-3 py-1 text-sm"
-            >
-              {s}
-            </button>
-          ))}
+      {unavailable && result.suggestions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <div className="font-head text-[13px] font-bold tracking-[0.05em]">FREE RIGHT NOW</div>
+          <div className="flex flex-wrap gap-2">
+            {result.suggestions.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setName(s)}
+                className="min-h-11 rounded-chip border-[1.5px] border-white px-4 text-[14px] font-semibold"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {submitError && <p className="text-xs text-orange-light">{submitError}</p>}
+      {submitError && <p className="text-[13px] font-semibold text-[#FF8A7A]">{submitError}</p>}
 
-      <PrimaryButton type="button" onClick={claim} disabled={!result?.available || submitting}>
-        {submitting ? 'Saving…' : 'Continue'}
-      </PrimaryButton>
+      <div className="mt-auto flex flex-col gap-2.5">
+        <button
+          type="button"
+          onClick={claim}
+          disabled={!canContinue}
+          className={
+            canContinue
+              ? 'flex h-14 items-center justify-center rounded-button font-head text-[14px] font-bold uppercase tracking-[0.03em] text-on-orange'
+              : 'flex h-14 items-center justify-center rounded-button bg-divider font-head text-[14px] font-bold uppercase tracking-[0.03em] text-ink-3'
+          }
+          style={canContinue ? { background: 'var(--grad-button)' } : undefined}
+        >
+          {submitting ? 'Saving…' : 'Continue'}
+        </button>
+        <div className="text-center text-[13px] leading-relaxed text-ink-3">
+          You can change it later in your profile.
+        </div>
+      </div>
     </div>
   );
 }

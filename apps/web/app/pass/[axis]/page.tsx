@@ -4,6 +4,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PartBar } from '@/components/ui/PartBar';
 import { ServiceTile } from '@/components/ui/ServiceTile';
 import { AXIS_LABEL } from '@/lib/axes';
+import { cn } from '@/lib/cn';
 import { EXAMPLE_PASS } from '@/lib/example';
 
 const AXES: Axis[] = ['sports', 'gaming', 'crypto', 'music', 'social', 'lifestyle'];
@@ -20,31 +21,37 @@ export default async function Category({ params }: { params: Promise<{ axis: str
 
   return (
     <AppShell back="/pass" title={AXIS_LABEL[a]}>
-      <div className="space-y-6 pt-2">
-        <div className="flex items-end justify-between rounded-panel border border-divider bg-panel p-4">
-          <div>
-            <div className="font-head text-5xl font-extrabold">{info.score}</div>
-            {info.topPct !== null && <div className="text-sm text-green">Top {info.topPct}%</div>}
+      <div className="space-y-[22px] pt-2">
+        <div className="flex items-end justify-between gap-3">
+          <div className="font-head text-[72px] font-extrabold leading-[0.95]">{info.score}</div>
+          <div className="flex flex-col items-end gap-1.5">
+            {info.topPct !== null && (
+              <span className="rounded-[10px] bg-blue px-3 py-1.5 font-head text-xs font-bold uppercase">
+                Top {info.topPct}%
+              </span>
+            )}
+            {info.delta !== 0 && (
+              <span
+                className={cn(
+                  'text-[13px] font-semibold',
+                  info.delta > 0 ? 'text-green' : 'text-orange-light',
+                )}
+              >
+                {info.delta > 0 ? `+${info.delta}` : info.delta} this week
+              </span>
+            )}
           </div>
-          {info.delta !== 0 && (
-            <div className={info.delta > 0 ? 'text-green' : 'text-orange-light'}>
-              {info.delta > 0 ? `+${info.delta}` : info.delta} this week
-            </div>
-          )}
         </div>
 
-        <section className="space-y-3 rounded-panel border border-divider bg-panel p-4">
-          <h2 className="font-head text-xs uppercase tracking-widest text-ink-3">Parts</h2>
+        <section className="space-y-4 rounded-panel bg-panel p-[18px]">
           <PartBar label="Volume" value={Math.min(100, info.score + 2)} />
           <PartBar label="Activity" value={Math.max(0, info.score - 6)} />
           <PartBar label="Depth" value={info.score} />
         </section>
 
         {unconnected.length > 0 && (
-          <section className="space-y-2">
-            <h2 className="font-head text-xs uppercase tracking-widest text-ink-3">
-              Grow this side
-            </h2>
+          <section className="space-y-3">
+            <h2 className="font-head text-lg font-extrabold uppercase">Grow this side</h2>
             <div className="grid grid-cols-2 gap-2">
               {unconnected.map((p) => (
                 <ServiceTile

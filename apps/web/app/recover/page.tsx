@@ -1,20 +1,96 @@
-import { Logo } from '@/components/brand/Logo';
-import { PrimaryButton, OutlineButton } from '@/components/ui/Button';
+import Link from 'next/link';
 
 /** A12 · Recover access — sign in with another linked method (docs/product-spec.md section 12). */
 export default function Recover() {
   return (
-    <main className="app-shell flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-      <Logo size={48} />
-      <h1 className="font-head text-2xl font-extrabold">Recover access</h1>
-      <p className="max-w-xs text-sm text-ink-2">Sign in with any method linked to your account.</p>
-      <div className="w-full max-w-xs space-y-3">
-        <PrimaryButton href="/api/auth/google/begin">Continue with Google</PrimaryButton>
-        <OutlineButton href="/login/email">Continue with email</OutlineButton>
+    <main className="app-shell flex min-h-dvh flex-col">
+      <header className="flex items-center gap-3.5 bg-[#16171B] px-5 py-3.5">
+        <Link
+          href="/login"
+          aria-label="Back to log in"
+          className="flex h-11 w-11 items-center justify-center rounded-chip border-[1.5px] border-white text-white"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+        </Link>
+        <span className="font-head text-base font-extrabold tracking-[0.04em]">RECOVER ACCESS</span>
+      </header>
+
+      <div className="flex flex-1 flex-col gap-[22px] px-5 py-6">
+        <div className="flex flex-col gap-2.5">
+          <h1 className="font-head text-2xl font-extrabold uppercase leading-[1.2]">
+            Get back into your pass
+          </h1>
+          <p className="text-[15px] leading-relaxed text-ink-2">
+            Use the other sign-in method you added to your pass.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <Link
+            href="/login/email"
+            className="flex min-h-[60px] items-center justify-between rounded-tile bg-panel px-4 py-3"
+          >
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[15px] font-semibold">Email login link</span>
+              <span className="text-[12px] text-ink-3">If you added an email to your pass</span>
+            </span>
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="shrink-0 text-orange"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+          <Link
+            href="/api/auth/google/begin"
+            className="flex min-h-[60px] items-center justify-between rounded-tile bg-panel px-4 py-3"
+          >
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[15px] font-semibold">Google</span>
+              <span className="text-[12px] text-ink-3">If you added Google in Sign-in methods</span>
+            </span>
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="shrink-0 text-orange"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </div>
+
+        <div className="mt-auto rounded-tile border-[1.5px] border-dashed border-[#6B7080] p-4 text-[13px] leading-relaxed text-ink-2">
+          Neither works? Write to [SUPPORT EMAIL]. We&rsquo;ll ask you to prove you own one of the
+          services connected to your pass.
+        </div>
       </div>
-      <p className="max-w-xs text-xs text-ink-3">
-        None of these work? Contact [your-domain]/support and confirm a connected service.
-      </p>
     </main>
   );
 }

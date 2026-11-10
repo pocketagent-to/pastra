@@ -2,60 +2,120 @@ import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
 import { Toggle } from '@/components/ui/Toggle';
 
-const ROWS = [
-  { href: '/settings/profile', label: 'Edit profile' },
-  { href: '/settings/sign-in', label: 'Sign-in methods' },
-  { href: '/terms', label: 'Terms' },
-  { href: '/privacy', label: 'Privacy' },
-];
+function RowArrow() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden="true"
+      className="shrink-0 text-orange"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
 
 /** G1 · Settings (docs/product-spec.md section 12). */
 export default function SettingsScreen() {
   return (
     <AppShell back="/pass" title="Settings">
-      <div className="space-y-6 pt-2">
-        <section className="divide-y divide-divider rounded-panel border border-divider bg-panel">
-          {ROWS.map((r) => (
+      <div className="flex flex-col gap-6 pt-2">
+        <section className="flex flex-col gap-3">
+          <div className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">Profile</div>
+          <div className="divide-y divide-divider rounded-panel bg-panel px-4">
             <Link
-              key={r.href}
-              href={r.href}
-              className="flex items-center justify-between p-4 hover:opacity-80"
+              href="/settings/profile"
+              className="flex min-h-16 items-center justify-between gap-3"
             >
-              <span>{r.label}</span>
-              <span className="text-ink-3">›</span>
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[15px] font-semibold">Edit profile</span>
+                <span className="text-xs text-ink-3">Name, photo and who sees each side</span>
+              </span>
+              <RowArrow />
             </Link>
-          ))}
-        </section>
-
-        <section className="space-y-1 rounded-panel border border-divider bg-panel p-4">
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm">Personalised offers</span>
-            <Toggle />
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm">Notify me on Telegram</span>
-            <Toggle />
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm">Notify me by email</span>
-            <Toggle defaultOn />
+            <Link
+              href="/settings/sign-in"
+              className="flex min-h-16 items-center justify-between gap-3"
+            >
+              <span className="text-[15px] font-semibold">Sign-in methods</span>
+              <RowArrow />
+            </Link>
           </div>
         </section>
 
-        <section className="divide-y divide-divider rounded-panel border border-divider bg-panel">
-          <form action="/api/me/export" method="post" className="p-4">
-            <button type="submit" className="text-sm text-ink-2">
-              Download my data
-            </button>
-          </form>
-          <form action="/api/auth/logout" method="post" className="p-4">
-            <button type="submit" className="text-sm text-ink-2">
-              Log out
-            </button>
-          </form>
-          <Link href="/settings/delete" className="block p-4 text-sm text-orange-light">
-            Delete account
-          </Link>
+        <section className="flex flex-col gap-3">
+          <div className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">
+            Offers and updates
+          </div>
+          <div className="divide-y divide-divider rounded-panel bg-panel px-4">
+            <div className="flex min-h-[60px] items-center justify-between gap-3">
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[15px]">Offers based on my activity</span>
+                <span className="text-xs text-ink-3">Partners never see your data</span>
+              </span>
+              <Toggle label="Offers based on my activity" defaultOn />
+            </div>
+            <div className="flex min-h-[52px] items-center justify-between gap-3">
+              <span className="text-[15px]">Weekly drop in Telegram</span>
+              <Toggle label="Weekly drop in Telegram" defaultOn />
+            </div>
+            <div className="flex min-h-[52px] items-center justify-between gap-3">
+              <span className="text-[15px]">Weekly drop by email</span>
+              <Toggle label="Weekly drop by email" />
+            </div>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <div className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">Account</div>
+          <div className="flex flex-col gap-2.5">
+            <Link
+              href="/services"
+              className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
+            >
+              Manage connected services
+            </Link>
+            <form action="/api/me/export" method="post">
+              <button
+                type="submit"
+                className="flex h-[52px] w-full items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
+              >
+                Download my data
+              </button>
+            </form>
+            <Link
+              href="/privacy"
+              className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
+            >
+              Privacy policy
+            </Link>
+            <Link
+              href="/terms"
+              className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
+            >
+              Terms of use
+            </Link>
+            <form action="/api/auth/logout" method="post">
+              <button
+                type="submit"
+                className="flex h-[52px] w-full items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
+              >
+                Log out
+              </button>
+            </form>
+            <Link
+              href="/settings/delete"
+              className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-[#FF8A7A] text-[15px] font-semibold text-[#FF8A7A]"
+            >
+              Delete account and all data
+            </Link>
+          </div>
         </section>
       </div>
     </AppShell>
