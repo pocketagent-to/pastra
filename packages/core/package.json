@@ -18,6 +18,7 @@
     "@pastra/notify": "workspace:*",
     "@pastra/providers": "workspace:*",
     "@pastra/scoring": "workspace:*",
+    "drizzle-orm": "0.45.4",
     "zod": "4.6.7"
   }
 }
