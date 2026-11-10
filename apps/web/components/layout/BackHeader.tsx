@@ -1,17 +1,29 @@
 import Link from 'next/link';
 
-/** A nested-screen header: a back link and a title (replaces the bottom nav). */
+/** A nested-screen header: a square back button and an uppercase title (design/Category.html). */
 export function BackHeader({ title, back = '/pass' }: { title: string; back?: string }) {
   return (
-    <header className="app-shell flex items-center gap-3 px-4 py-3">
+    <header className="app-shell flex items-center gap-3.5 bg-[#16171B] px-5 py-3.5">
       <Link
         href={back}
         aria-label="Back"
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-divider bg-panel text-ink-2"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border-[1.5px] border-white"
       >
-        ←
+        <svg
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M19 12H5M11 6l-6 6 6 6" />
+        </svg>
       </Link>
-      <h1 className="font-head text-lg font-bold">{title}</h1>
+      <h1 className="font-head text-base font-extrabold uppercase tracking-[0.04em]">{title}</h1>
     </header>
   );
 }

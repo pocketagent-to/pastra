@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn';
 
-/** A stamp chip (achievement or service), with an optional "new this week" dot. */
+/** A stamp chip (design/Main.html): white-bordered pill when earned, dashed grey when not. */
 export function StampBadge({
   label,
   isNew = false,
@@ -12,14 +12,12 @@ export function StampBadge({
 }) {
   return (
     <span
+      data-new={isNew ? '' : undefined}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-chip border px-2.5 py-1 text-xs font-semibold',
-        earned
-          ? 'border-divider bg-white/5 text-ink'
-          : 'border-divider/60 bg-transparent text-ink-3',
+        'inline-flex items-center rounded-[12px] border-[1.5px] px-3.5 py-[9px] text-[13px] font-semibold',
+        earned ? 'border-white text-ink' : 'border-dashed border-[#6B7080] text-ink-3',
       )}
     >
-      {isNew && <span className="h-1.5 w-1.5 rounded-full bg-orange" aria-label="new" />}
       {label}
     </span>
   );

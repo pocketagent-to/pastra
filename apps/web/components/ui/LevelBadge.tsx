@@ -1,11 +1,20 @@
 import { cn } from '@/lib/cn';
 
-/** The "LVL 27" badge shown on the pass, card and share images. */
-export function LevelBadge({ level, className }: { level: number; className?: string }) {
+/** The "LVL 27" badge shown on the pass, card and share images (design/Main.html): solid orange. */
+export function LevelBadge({
+  level,
+  muted = false,
+  className,
+}: {
+  level: number;
+  muted?: boolean;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-chip border border-divider bg-panel px-2.5 py-1 font-head text-sm font-bold',
+        'inline-flex items-center rounded-[10px] px-3 py-1.5 font-head text-[13px] font-bold',
+        muted ? 'bg-divider text-ink-3' : 'bg-orange text-on-orange',
         className,
       )}
     >
