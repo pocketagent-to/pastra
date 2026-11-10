@@ -6,7 +6,8 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
-    include: ['packages/*/test/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
+    include: ['packages/*/test/**/*.test.ts', 'packages/*/src/**/*.test.ts', 'apps/*/**/*.test.ts'],
+    exclude: ['**/node_modules/**', '**/.next/**', '**/dist/**'],
     environment: 'node',
     globals: false,
   },

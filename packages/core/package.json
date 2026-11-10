@@ -1,0 +1,23 @@
+{
+  "name": "@pastra/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@pastra/card": "workspace:*",
+    "@pastra/catalog": "workspace:*",
+    "@pastra/config": "workspace:*",
+    "@pastra/crypto": "workspace:*",
+    "@pastra/db": "workspace:*",
+    "@pastra/notify": "workspace:*",
+    "@pastra/providers": "workspace:*",
+    "@pastra/scoring": "workspace:*",
+    "zod": "4.6.7"
+  }
+}

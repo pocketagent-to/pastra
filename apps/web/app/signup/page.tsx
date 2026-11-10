@@ -1,30 +1,36 @@
-import { catalog } from '@pastra/catalog';
+import { Logo } from '@/components/brand/Logo';
+import { PrimaryButton, OutlineButton } from '@/components/ui/Button';
 
 /**
- * Placeholder sign-up screen (A1). The real screen — Google and email only — is built in stage 3
- * from the `SignUp` mockup. This stub confirms the app boots and can read the catalog on the server.
+ * Sign up (A1). Two methods only — Google and email magic link (docs/product-spec.md section 4).
+ * This is the layout; the auth wiring lands in stage 3. Continuing accepts Terms and Privacy.
  */
 export default function SignUp() {
-  const liveServices = catalog.providers.filter((p) => p.status === 'live').length;
   return (
-    <main
-      style={{
-        maxWidth: 430,
-        margin: '0 auto',
-        minHeight: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 16,
-        padding: '0 16px',
-        textAlign: 'center',
-      }}
-    >
-      <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>Pastra</h1>
-      <p style={{ color: 'var(--text-secondary)', margin: 0, maxWidth: 320 }}>
-        Six sides of your life in one hexagon, plus a crypto card. Scaffold is live — screens arrive
-        in stage 3. {liveServices} services ready in the catalog.
+    <main className="app-shell flex min-h-dvh flex-col items-center justify-center gap-8 px-6 text-center">
+      <Logo size={56} />
+      <div className="space-y-2">
+        <h1 className="font-head text-3xl font-extrabold tracking-tight">Get your pass</h1>
+        <p className="max-w-xs text-sm text-ink-2">
+          Six sides of your life in one hexagon, plus a crypto card.
+        </p>
+      </div>
+
+      <div className="w-full max-w-xs space-y-3">
+        <PrimaryButton href="/api/auth/google/begin">Continue with Google</PrimaryButton>
+        <OutlineButton href="/login/email">Continue with email</OutlineButton>
+      </div>
+
+      <p className="max-w-xs text-xs text-ink-3">
+        By continuing you accept our{' '}
+        <a href="/terms" className="underline">
+          Terms
+        </a>{' '}
+        and{' '}
+        <a href="/privacy" className="underline">
+          Privacy
+        </a>
+        .
       </p>
     </main>
   );

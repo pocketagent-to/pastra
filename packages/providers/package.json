@@ -1,0 +1,18 @@
+{
+  "name": "@pastra/providers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@pastra/catalog": "workspace:*",
+    "@pastra/crypto": "workspace:*",
+    "viem": "2.57.17",
+    "zod": "4.6.7"
+  }
+}

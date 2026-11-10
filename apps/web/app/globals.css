@@ -1,11 +1,44 @@
+@import 'tailwindcss';
+
+/* Design tokens from the mockups (docs/architecture.md section 13). */
+@theme {
+  --color-panel: #16171b;
+  --color-divider: #2a2c34;
+  --color-hexgrid: #3a3d47;
+
+  --color-blue: #1f4bff;
+  --color-orange: #ff6b2c;
+  --color-orange-light: #ff8a57;
+  --color-purple: #6a3dff;
+  --color-pink: #ff4d8d;
+
+  --color-status: #1e9e57;
+  --color-green: #4ade80;
+
+  --color-ink: #ffffff;
+  --color-ink-2: #c7cbd6;
+  --color-ink-3: #a3a8b3;
+  --color-on-orange: #0a0a0a;
+
+  --radius-panel: 24px;
+  --radius-card: 22px;
+  --radius-button: 16px;
+  --radius-tile: 18px;
+  --radius-chip: 12px;
+
+  --font-head: var(--font-unbounded), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Gradients and the screen background (docs/architecture.md section 13). */
 :root {
   --bg-screen: radial-gradient(130% 55% at 50% 0%, #10217a 0%, #05081f 45%, #000000 75%);
-  --panel: #16171b;
-  --divider: #2a2c34;
-  --text: #ffffff;
-  --text-secondary: #c7cbd6;
-  --accent-blue: #1f4bff;
-  --accent-orange: #ff6b2c;
+  --bg-reveal: radial-gradient(130% 55% at 50% 0%, #2b1260 0%, #0a0820 70%);
+  --grad-text: linear-gradient(90deg, #ff6b2c 0%, #c04dff 50%, #7c9bff 100%);
+  --grad-hex: linear-gradient(90deg, #ff6b2c 0%, #c04dff 50%, #3d6bff 100%);
+  --grad-button: linear-gradient(90deg, #ff6b2c 0%, #ff4d8d 100%);
+  --grad-card: linear-gradient(135deg, #1f4bff 0%, #6a3dff 50%, #ff4d8d 100%);
+  --grad-timer: linear-gradient(135deg, #0b1238 0%, #2b1260 100%);
 }
 
 * {
@@ -23,15 +56,30 @@ body {
   background: #05081f;
   background-image: var(--bg-screen);
   background-attachment: fixed;
-  color: var(--text);
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Reusable utilities for gradient text and on-brand surfaces. */
+@utility text-gradient {
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility app-shell {
+  max-width: 430px;
+  margin-inline: auto;
+  width: 100%;
 }
