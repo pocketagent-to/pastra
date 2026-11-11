@@ -25,16 +25,6 @@ function PassIcon() {
   );
 }
 
-function OffersIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M4 12v8h16v-8" />
-      <path d="M2 8h20v4H2z" />
-      <path d="M12 8v12" />
-    </svg>
-  );
-}
-
 function FriendsIcon() {
   return (
     <svg {...iconProps}>
@@ -64,18 +54,20 @@ function ServicesIcon() {
 
 const TABS = [
   { href: '/pass', label: 'Pass', Icon: PassIcon },
-  { href: '/offers', label: 'Offers', Icon: OffersIcon },
   { href: '/friends', label: 'Friends', Icon: FriendsIcon },
   { href: '/card', label: 'Card', Icon: CardIcon },
   { href: '/services', label: 'Services', Icon: ServicesIcon },
 ] as const;
 
-/** The five-tab bottom navigation. Active tab is orange (docs/architecture.md section 13). */
+// Offers is hidden for now: offers are card-tied and the card is not live yet (Wirex pending). The
+// offer engine, admin tooling and /offers routes stay intact; `/offers` redirects to /pass (see
+// next.config.ts) and the tab returns when the card launches.
+/** The bottom navigation. Active tab is orange (docs/architecture.md section 13). */
 export function BottomNav() {
   const pathname = usePathname();
   return (
     <nav className="app-bottom-nav app-shell shrink-0 border-t border-divider bg-[#16171B]">
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-4">
         {TABS.map(({ href, label, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (

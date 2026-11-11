@@ -1,5 +1,5 @@
 import { AppShell } from '@/components/layout/AppShell';
-import { PrimaryButton, OutlineButton } from '@/components/ui/Button';
+import { PrimaryButton } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
 import { currentWeek, getRecapView } from '@pastra/core';
 import { requireUser } from '@/lib/data';
@@ -109,8 +109,7 @@ export default async function Recap() {
         )}
 
         <div className="mt-auto flex flex-col gap-2.5 pb-2">
-          <PrimaryButton href="/offers">See 3 new offers</PrimaryButton>
-          <OutlineButton href="/share">Share my week</OutlineButton>
+          <PrimaryButton href="/share">Share my week</PrimaryButton>
         </div>
       </div>
     </AppShell>
