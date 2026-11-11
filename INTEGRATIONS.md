@@ -27,14 +27,14 @@ OAuth/API flow automatically (`liveProviders()` in `apps/web/lib/server.ts`).
 | **Steam** | Web API key | <https://steamcommunity.com/dev/apikey> | `STEAM_WEB_API_KEY` | OpenID login needs no app; data is read with the Web API key. Public profile with hidden game details shows the "private profile" screen. |
 | **GitHub** | OAuth App → Client ID + Secret | <https://github.com/settings/developers> | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | scope `read:user`. Tokens don't expire. |
 | **Discord** | Application → OAuth2 creds | <https://discord.com/developers/applications> | `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` | scopes `identify guilds`. Add the redirect URL under OAuth2 → Redirects. |
-| **Twitch** | Application → Client ID + Secret | <https://dev.twitch.tv/console/apps> | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Set the OAuth Redirect URL on the app. |
+| **Twitch** | Application → Client ID + Secret | <https://dev.twitch.tv/console/apps> | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | scope `user:read:follows` (channels you follow, not paid subs). Set the OAuth Redirect URL on the app. |
 | **X (Twitter)** | Project + App → OAuth 2.0 Client ID + Secret | <https://developer.twitter.com/en/portal/dashboard> | `X_CLIENT_ID`, `X_CLIENT_SECRET` | scopes `users.read tweet.read offline.access`, PKCE on. Reading profile metrics needs a **paid** API tier; the daily spend cap is `X_DAILY_SPEND_CAP`. |
-| **TIDAL** | App → Client ID + Secret | <https://developer.tidal.com/> | `TIDAL_CLIENT_ID`, `TIDAL_CLIENT_SECRET` | Register the redirect URL. |
+| **TIDAL** | App → Client ID + Secret | <https://developer.tidal.com/> | `TIDAL_CLIENT_ID`, `TIDAL_CLIENT_SECRET` | scopes `user.read collection.read`. Register the redirect URL. |
 | **AniList** | API client | <https://anilist.co/settings/developer> | `ANILIST_CLIENT_ID`, `ANILIST_CLIENT_SECRET` | GraphQL API, no extra scopes. |
 | **lichess** | Personal OAuth app (public PKCE, **no secret**) | <https://lichess.org/account/oauth/app> | `LICHESS_CLIENT_ID` | Public client; the client id can be your app identifier. |
 | **YouTube** | Google OAuth client ID + Secret | <https://console.cloud.google.com/apis/credentials> | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Enable **YouTube Data API v3**; scope `youtube.readonly`. Stays `coming_soon` until Google verifies the app. |
 | **Apple Music** | MusicKit identifier + private key → developer token | <https://developer.apple.com> (paid Apple Developer Program) | `APPLE_MUSIC_KEY` (developer token) | The user's Music-User-Token is obtained in-browser via MusicKit JS; it is short-lived (frequent reconnect is normal). |
-| **Polar** | AccessLink app | <https://admin.polaraccesslink.com/> | `POLAR_CLIENT_ID`, `POLAR_CLIENT_SECRET` | Only workout summaries / steps are requested — no heart-rate scope. |
+| **Polar** | AccessLink app | <https://admin.polaraccesslink.com/> | `POLAR_CLIENT_ID`, `POLAR_CLIENT_SECRET` | scope `accesslink.read_all`; only workout summaries / steps are read — no heart-rate handling. |
 | **WHOOP** | Developer app | <https://developer.whoop.com/> | `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET` | scopes `read:profile read:workout read:cycles offline`. |
 | **Oura** | OAuth application | <https://cloud.ouraring.com/oauth/applications> | `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET` | scopes `daily workout personal`. |
 | **EVM wallet** | Alchemy API key | <https://dashboard.alchemy.com/> | `ALCHEMY_KEY` | No login; the user signs a message. Only counts/dates are read, never balances. Chains: `EVM_CHAINS`. |
