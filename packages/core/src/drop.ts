@@ -107,9 +107,9 @@ export async function writeRecaps(
   db: Database,
   catalog: Catalog,
   params: { week: string; prevWeek?: string; userIds: string[] },
-): Promise<void> {
+): Promise<{ failed: number }> {
   const { week, prevWeek, userIds } = params;
-  if (userIds.length === 0) return;
+  if (userIds.length === 0) return { failed: 0 };
 
   const prevByUser = new Map<string, { level: number; axes: Record<string, number> }>();
   if (prevWeek) {
@@ -132,14 +132,22 @@ export async function writeRecaps(
     }
   }
 
+  let failed = 0;
   for (const userId of userIds) {
-    const result = await recompute(db, catalog, { userId, week, state: 'live' });
-    const prev = prevByUser.get(userId);
-    await db
-      .insert(recaps)
-      .values({ userId, week, payload: buildRecapPayload(prev?.level, result, prev?.axes) })
-      .onConflictDoNothing({ target: [recaps.userId, recaps.week] });
+    try {
+      const result = await recompute(db, catalog, { userId, week, state: 'live' });
+      const prev = prevByUser.get(userId);
+      await db
+        .insert(recaps)
+        .values({ userId, week, payload: buildRecapPayload(prev?.level, result, prev?.axes) })
+        .onConflictDoNothing({ target: [recaps.userId, recaps.week] });
+    } catch {
+      // Isolate one user's failure so the rest of the chunk still gets recaps (the insert is
+      // idempotent, so a later re-run backfills the skipped user); surface the count to the caller.
+      failed += 1;
+    }
   }
+  return { failed };
 }
 
 /** Publish the drop: promote the week once, then award stamps and write recaps for every user. */

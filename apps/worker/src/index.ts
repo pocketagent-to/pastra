@@ -18,6 +18,18 @@ function dropParams(now: Date = new Date()) {
 
 async function main(): Promise<void> {
   const deps = createDeps();
+
+  // pg-boss and migrations need a DIRECT session connection (LISTEN/NOTIFY, advisory locks). If the
+  // resolved direct url is actually the pgbouncer pooler, fail fast with an actionable message
+  // instead of starting and silently misbehaving (set DATABASE_URL_UNPOOLED to the non-pooler url).
+  const directUrl = directDatabaseUrl(deps.config);
+  if (/-pooler\./.test(directUrl) || directUrl.includes('pgbouncer')) {
+    throw new Error(
+      'Worker requires the DIRECT database endpoint: set DATABASE_URL_UNPOOLED to the non-pooler ' +
+        'Neon url. pg-boss cannot run on the pgbouncer transaction pooler.',
+    );
+  }
+
   logEvent('worker_start', {
     env: deps.config.NODE_ENV,
     card: deps.config.CARD_PROVIDER,
@@ -32,8 +44,7 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // pg-boss must use the DIRECT endpoint (LISTEN/NOTIFY, advisory locks) — never the pgbouncer pooler.
-  const boss = new PgBoss(directDatabaseUrl(deps.config));
+  const boss = new PgBoss(directUrl);
   boss.on('error', (error: unknown) => captureError('pg_boss_error', error));
   await boss.start();
   await boss.createQueue(DROP_QUEUE);

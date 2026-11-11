@@ -104,7 +104,9 @@ export async function completeConnection(
     connectionId = row!.id;
   }
 
-  await syncConnection(deps, { connectionId, week: params.week });
+  // Connect runs inside the user-facing OAuth callback (a serverless request with a short deadline),
+  // so do a single fetch here — no multi-second backoff. The weekly drop syncs with full retry.
+  await syncConnection(deps, { connectionId, week: params.week, retry: { attempts: 1 } });
   await recompute(db, deps.catalog, { userId: params.userId, week: params.week, state: 'live' });
   return { connectionId };
 }

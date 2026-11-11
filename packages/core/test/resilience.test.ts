@@ -83,6 +83,38 @@ describe('createProviderLimiter', () => {
     expect(peak).toBeLessThanOrEqual(2);
   });
 
+  it('hands slots to waiters without leaking or over-granting', async () => {
+    const limiter = createProviderLimiter(() => ({ perMinute: 0, concurrency: 2 }), {
+      sleep: noSleep,
+      now: () => 0,
+    });
+    let active = 0;
+    let peak = 0;
+    const gates: Array<() => void> = [];
+    const run = () =>
+      limiter.run('p', async () => {
+        active += 1;
+        peak = Math.max(peak, active);
+        await new Promise<void>((resolve) => gates.push(resolve));
+        active -= 1;
+      });
+    const flush = async () => {
+      for (let i = 0; i < 6; i++) await Promise.resolve();
+    };
+
+    const tasks = [run(), run(), run(), run(), run()]; // 2 enter, 3 queue
+    await flush();
+    expect(peak).toBe(2);
+    // Resolve one in-flight task at a time; each release must hand its slot to exactly one waiter.
+    while (gates.length) {
+      gates.shift()!();
+      await flush();
+    }
+    await Promise.all(tasks);
+    expect(peak).toBeLessThanOrEqual(2);
+    expect(active).toBe(0); // no leaked slots
+  });
+
   it('paces starts according to perMinute', async () => {
     const slept: number[] = [];
     let clock = 0;

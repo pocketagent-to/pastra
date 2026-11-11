@@ -148,9 +148,15 @@ export async function runDrop(
     if (page.length === 0) break;
     recapCursor = page[page.length - 1]!.id;
     try {
-      await writeRecaps(db, catalog, { week, prevWeek, userIds: page.map((u) => u.id) });
+      const { failed: recapFailed } = await writeRecaps(db, catalog, {
+        week,
+        prevWeek,
+        userIds: page.map((u) => u.id),
+      });
+      failed += recapFailed; // per-user failures inside the chunk are isolated and counted
     } catch {
-      failed += 1;
+      // The chunk's prev-week batch read failed (rare) — the whole chunk's recaps are skipped.
+      failed += page.length;
     }
     if (page.length < PAGE) break;
   }

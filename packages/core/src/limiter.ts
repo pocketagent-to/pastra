@@ -51,14 +51,19 @@ export function createProviderLimiter(
       state.active += 1;
       return;
     }
+    // Queue for a slot. `release` hands its slot over directly (without decrementing active), so the
+    // woken waiter already holds the slot and must NOT increment again — otherwise a fresh fast-path
+    // acquire could slip into the gap between the decrement and the waiter's resume, over-granting.
     await new Promise<void>((resolve) => state.waiters.push(resolve));
-    state.active += 1;
   }
 
   function release(state: ProviderState): void {
-    state.active -= 1;
     const next = state.waiters.shift();
-    if (next) next();
+    if (next) {
+      next(); // transfer the held slot to the next waiter; active is unchanged
+    } else {
+      state.active -= 1; // no waiter: free the slot
+    }
   }
 
   return {
