@@ -1,4 +1,5 @@
 import { PgBoss } from 'pg-boss';
+import { directDatabaseUrl } from '@pastra/config';
 import { addWeeks, currentWeek } from '@pastra/core';
 import { createDeps } from './deps';
 import { runDrop } from './drop-chain';
@@ -28,7 +29,8 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  const boss = new PgBoss(deps.config.DATABASE_URL);
+  // pg-boss must use the DIRECT endpoint (LISTEN/NOTIFY, advisory locks) — never the pgbouncer pooler.
+  const boss = new PgBoss(directDatabaseUrl(deps.config));
   boss.on('error', (error: unknown) => log(`pg-boss error: ${(error as Error).message}`));
   await boss.start();
   await boss.createQueue(DROP_QUEUE);

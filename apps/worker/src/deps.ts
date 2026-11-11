@@ -1,5 +1,5 @@
 import { catalog } from '@pastra/catalog';
-import { getConfig, type Config } from '@pastra/config';
+import { getConfig, directDatabaseUrl, type Config } from '@pastra/config';
 import { TokenCipher } from '@pastra/crypto';
 import { buildRegistry, type AdapterRegistry } from '@pastra/providers';
 import { createCardProvider, type CardProvider } from '@pastra/card';
@@ -22,7 +22,9 @@ export function createDeps(): WorkerDeps {
   const config = getConfig();
   return {
     config,
-    db: createDb(config.DATABASE_URL),
+    // The worker is long-lived and uses the DIRECT endpoint (pg-boss needs LISTEN/NOTIFY and
+    // advisory locks, which the pgbouncer pooler does not support).
+    db: createDb(directDatabaseUrl(config), 'persistent'),
     catalog,
     cipher: TokenCipher.fromEnv(config.TOKEN_ENC_KEYS),
     registry: buildRegistry(),

@@ -121,7 +121,8 @@ export function liveProviders(): Set<ProviderId> {
 }
 
 export function getDb(): Database {
-  dbSingleton ??= createDb(getConfig().DATABASE_URL);
+  // Serverless: the Neon pooler endpoint, one multiplexed connection per warm instance.
+  dbSingleton ??= createDb(getConfig().DATABASE_URL, 'serverless');
   return dbSingleton;
 }
 

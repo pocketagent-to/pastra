@@ -3,7 +3,7 @@
  *   docker compose up -d && pnpm --filter @pastra/db migrate && pnpm db:seed
  */
 import { catalog } from '@pastra/catalog';
-import { getConfig } from '@pastra/config';
+import { getConfig, directDatabaseUrl } from '@pastra/config';
 import { TokenCipher } from '@pastra/crypto';
 import { buildRegistry } from '@pastra/providers';
 import { createDb } from '@pastra/db';
@@ -21,7 +21,7 @@ import {
 } from '@pastra/db';
 import { completeConnection, currentWeek, mondayOf, selectOffers } from '@pastra/core';
 
-const db = createDb(getConfig().DATABASE_URL);
+const db = createDb(directDatabaseUrl(getConfig()), 'persistent');
 const deps = {
   db,
   catalog,

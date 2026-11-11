@@ -39,7 +39,11 @@ export const configSchema = z.object({
   // A development-only sign-in shortcut; never enabled in production.
   DEV_LOGIN_ENABLED: boolish(false),
 
+  // The POOLED endpoint (Neon `-pooler`, pgbouncer transaction mode) — used by serverless web.
   DATABASE_URL: z.string().min(1).default('postgres://pastra:pastra@localhost:5432/pastra'),
+  // The DIRECT endpoint — used by migrations, the worker and seed (pg-boss LISTEN/NOTIFY, DDL,
+  // prepared statements). Empty in local dev, where it falls back to DATABASE_URL (one Postgres).
+  DATABASE_URL_UNPOOLED: z.string().default(''),
   SESSION_SECRET: z.string().min(1).default('dev-session-secret-change-me'),
   TOKEN_ENC_KEYS: z.string().min(1).default('v1:00000000000000000000000000000000000000000000'),
   HMAC_KEY: z.string().min(1).default('dev-hmac-key-change-me'),
@@ -155,6 +159,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     throw new ConfigError(result.error);
   }
   return result.data;
+}
+
+/**
+ * The DIRECT (non-pooled) connection string for the worker, migrations and seed. Falls back to
+ * DATABASE_URL in local dev, where there is a single Postgres and no pooler.
+ */
+export function directDatabaseUrl(config: Config): string {
+  return config.DATABASE_URL_UNPOOLED || config.DATABASE_URL;
 }
 
 let cached: Config | undefined;

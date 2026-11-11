@@ -7,15 +7,24 @@ live test: connecting a service recomputes the pass on demand.
 ## 1. Database — Neon (managed Postgres)
 
 1. Create a project at <https://neon.tech> (free tier).
-2. Copy the **connection string**. Prefer the **direct** (non-pooled) string for the first deploy —
-   migrations run cleanly against it. It looks like:
-   `postgresql://USER:PASSWORD@ep-xxxx.REGION.aws.neon.tech/neondb?sslmode=require`
-3. This value becomes `DATABASE_URL` below. (SSL is already required by the Neon URL — the
-   `postgres` driver honours `sslmode=require`.)
+2. Neon gives you **two** host forms for the same database — copy both:
+   - the **pooled** string (host contains `-pooler`, pgbouncer transaction mode):
+     `postgresql://USER:PASSWORD@ep-xxxx-pooler.REGION.aws.neon.tech/neondb?sslmode=require`
+   - the **direct** string (no `-pooler`):
+     `postgresql://USER:PASSWORD@ep-xxxx.REGION.aws.neon.tech/neondb?sslmode=require`
+3. Set **`DATABASE_URL` = the pooled string** (serverless web multiplexes through the pooler) and
+   **`DATABASE_URL_UNPOOLED` = the direct string**. (SSL is required by the Neon URL — the `postgres`
+   driver honours `sslmode=require`.)
 
-The database schema is created automatically: the Vercel build runs `drizzle-kit migrate` before
-`next build` (see `apps/web/vercel.json`). `drizzle-kit migrate` is idempotent, so every later deploy
-is a no-op once the schema exists.
+Why both: Vercel functions are serverless, so each warm instance opens its own connection; the
+pooler keeps the total from exhausting Postgres. But migrations (DDL) and the background worker
+(pg-boss needs `LISTEN/NOTIFY` and advisory locks) require a **direct** session connection, which the
+transaction pooler cannot provide — so those read `DATABASE_URL_UNPOOLED`. Locally there is one
+Postgres and no pooler, so `DATABASE_URL_UNPOOLED` can be left empty (it falls back to `DATABASE_URL`).
+
+The database schema is created automatically: the Vercel build runs `drizzle-kit migrate` (against
+the direct endpoint) before `next build` (see `apps/web/vercel.json`). `drizzle-kit migrate` is
+idempotent, so every later deploy is a no-op once the schema exists.
 
 ## 2. Web app — Vercel
 
@@ -40,7 +49,8 @@ Without the origin allowlisted, Privy login is rejected in the browser.
 
 | Variable                  | Value                                                              | Notes |
 | ------------------------- | ----------------------------------------------------------------- | ----- |
-| `DATABASE_URL`            | Neon connection string (direct, `?sslmode=require`)               | required |
+| `DATABASE_URL`            | Neon **pooled** string (`-pooler` host, `?sslmode=require`)       | required — serverless web |
+| `DATABASE_URL_UNPOOLED`   | Neon **direct** string (no `-pooler`, `?sslmode=require`)         | migrations + worker; empty locally |
 | `APP_URL`                 | `https://<project>.vercel.app`                                    | the live URL |
 | `SESSION_SECRET`          | 32-byte random hex                                                | generate fresh |
 | `HMAC_KEY`                | 32-byte random hex                                                | generate fresh |
