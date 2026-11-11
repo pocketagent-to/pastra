@@ -105,7 +105,7 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
           </div>
           {[
             'Activate this offer',
-            'Pay with your Pastra card at the partner',
+            'Pay with your Hextra card at the partner',
             'Cashback lands when the payment settles',
           ].map((step, i) => (
             <div key={step} className="flex items-center gap-3 text-sm">

@@ -42,7 +42,7 @@ function AdminHeader() {
             />
           </g>
         </svg>
-        <div className="font-head text-base font-extrabold tracking-[0.04em]">PASTRA</div>
+        <div className="font-head text-base font-extrabold tracking-[0.04em]">HEXTRA</div>
       </div>
       <div className="rounded-lg bg-divider px-2.5 py-[5px] text-xs font-semibold text-ink-2">
         ADMIN

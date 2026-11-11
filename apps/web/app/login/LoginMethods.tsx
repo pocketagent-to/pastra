@@ -58,7 +58,7 @@ function MethodsMarkup({
   );
 }
 
-/** Privy-backed sign-in (email + Google), exchanging the Privy token for a Pastra session. */
+/** Privy-backed sign-in (email + Google), exchanging the Privy token for a Hextra session. */
 function PrivyMethods() {
   const router = useRouter();
   const { login } = useLogin({

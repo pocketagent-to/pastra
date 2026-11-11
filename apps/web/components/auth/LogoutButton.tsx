@@ -49,7 +49,7 @@ function PlainLogout() {
   );
 }
 
-/** Logs out of both the Pastra session and Privy, then returns to the sign-in screen. */
+/** Logs out of both the Hextra session and Privy, then returns to the sign-in screen. */
 export function LogoutButton({ privyConfigured }: { privyConfigured: boolean }) {
   return privyConfigured ? <PrivyLogout /> : <PlainLogout />;
 }

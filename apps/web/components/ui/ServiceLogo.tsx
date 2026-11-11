@@ -2,7 +2,7 @@ import type { ProviderId } from '@pastra/catalog';
 import { logoSrc } from '@/lib/logos';
 import { cn } from '@/lib/cn';
 
-/** A service's logo, or a letter tile fallback (used for Card spend / the Pastra mark). */
+/** A service's logo, or a letter tile fallback (used for Card spend / the Hextra mark). */
 export function ServiceLogo({
   provider,
   name,

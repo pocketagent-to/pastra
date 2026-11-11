@@ -3,8 +3,8 @@ import { AppShell } from '@/components/layout/AppShell';
 
 const SECTIONS = [
   {
-    title: '1. What Pastra is',
-    body: 'Pastra builds a personal pass from services you choose to connect and shows weekly offers based on your activity.',
+    title: '1. What Hextra is',
+    body: 'Hextra builds a personal pass from services you choose to connect and shows weekly offers based on your activity.',
   },
   {
     title: '2. Your account',

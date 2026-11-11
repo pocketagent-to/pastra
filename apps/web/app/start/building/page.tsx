@@ -41,7 +41,9 @@ function Building() {
         if (!res.ok || !active) return;
         const p = (await res.json()) as Progress;
         if (!active) return;
-        setFound((n) => Math.min(STEPS.length, Math.max(n, p.done ? STEPS.length : p.metricsFound.length)));
+        setFound((n) =>
+          Math.min(STEPS.length, Math.max(n, p.done ? STEPS.length : p.metricsFound.length)),
+        );
         if (p.done) setDone(true);
       } catch {
         /* ignore transient poll errors; the next tick retries */
@@ -62,7 +64,7 @@ function Building() {
     <div className="app-shell flex min-h-dvh flex-col">
       <header className="flex min-h-11 items-center gap-2.5 bg-panel px-5 py-3.5">
         <Logo size={34} />
-        <span className="font-head text-lg font-extrabold tracking-[0.04em]">PASTRA</span>
+        <span className="font-head text-lg font-extrabold tracking-[0.04em]">HEXTRA</span>
       </header>
 
       <main className="flex flex-1 flex-col gap-6 px-5 pt-7 pb-6">

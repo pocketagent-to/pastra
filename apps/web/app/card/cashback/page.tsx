@@ -43,7 +43,7 @@ export default function CardCashback() {
           <p className="font-semibold text-ink">How boosts work</p>
           <ol className="mt-2 list-decimal space-y-1 pl-4">
             <li>Activate an offer here.</li>
-            <li>Pay with your Pastra card at the merchant.</li>
+            <li>Pay with your Hextra card at the merchant.</li>
             <li>Cashback lands on your card balance.</li>
           </ol>
         </div>

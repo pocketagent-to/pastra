@@ -65,7 +65,7 @@ function Tiles({ start }: { start: () => void }) {
   );
 }
 
-/** Privy-backed recovery, exchanging the Privy token for a Pastra session. */
+/** Privy-backed recovery, exchanging the Privy token for a Hextra session. */
 function PrivyRecover() {
   const router = useRouter();
   const { login } = useLogin({

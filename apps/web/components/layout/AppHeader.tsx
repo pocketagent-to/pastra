@@ -5,9 +5,9 @@ import { Logo } from '@/components/brand/Logo';
 export function AppHeader() {
   return (
     <header className="app-shell flex items-center justify-between bg-[#16171B] px-5 py-3.5">
-      <Link href="/pass" aria-label="Pastra home" className="flex items-center gap-2.5">
+      <Link href="/pass" aria-label="Hextra home" className="flex items-center gap-2.5">
         <Logo size={34} />
-        <span className="font-head text-lg font-extrabold tracking-[0.04em]">PASTRA</span>
+        <span className="font-head text-lg font-extrabold tracking-[0.04em]">HEXTRA</span>
       </Link>
       <Link
         href="/settings"

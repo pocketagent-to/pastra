@@ -54,7 +54,7 @@ export function AppleMusicConnect({
       const mk = (window as WindowWithMusicKit).MusicKit;
       if (!mk) return;
       try {
-        await mk.configure({ developerToken, app: { name: 'Pastra', build: '1.0.0' } });
+        await mk.configure({ developerToken, app: { name: 'Hextra', build: '1.0.0' } });
         if (!cancelled) setReady(true);
       } catch {
         if (!cancelled) setError('Could not start Apple Music. Reload and try again.');

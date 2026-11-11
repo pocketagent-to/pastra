@@ -18,7 +18,7 @@ export default function FirstConnect() {
     <div className="app-shell flex min-h-dvh flex-col">
       <header className="flex min-h-11 items-center gap-2.5 bg-panel px-5 py-3.5">
         <Logo size={34} />
-        <span className="font-head text-lg font-extrabold tracking-[0.04em]">PASTRA</span>
+        <span className="font-head text-lg font-extrabold tracking-[0.04em]">HEXTRA</span>
       </header>
 
       <main className="flex flex-1 flex-col gap-[22px] px-5 pt-7 pb-6">

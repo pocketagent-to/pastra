@@ -4,7 +4,7 @@ import { Providers } from '@/components/auth/Providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Pastra',
+  title: 'Hextra',
   description: 'Your pass: six sides of your life in one hexagon, plus a crypto card.',
 };
 

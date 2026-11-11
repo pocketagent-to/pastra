@@ -171,7 +171,11 @@ function SignFooter({
 }) {
   const busy = status === 'signing' || status === 'verifying';
   const label =
-    status === 'signing' ? 'Check your wallet…' : status === 'verifying' ? 'Verifying…' : 'Open my wallet';
+    status === 'signing'
+      ? 'Check your wallet…'
+      : status === 'verifying'
+        ? 'Verifying…'
+        : 'Open my wallet';
   return (
     <div className="mt-auto flex flex-col gap-2.5">
       {error && <p className="text-[13px] font-semibold text-[#FF8A7A]">{error}</p>}
@@ -198,8 +202,8 @@ function ComingSoonFooter() {
   return (
     <div className="mt-auto flex flex-col gap-2.5">
       <div className="rounded-tile border border-divider bg-panel px-4 py-3.5 text-[13px] leading-[1.5] text-ink-2">
-        Signing in with this wallet is coming soon. For now, connect an EVM wallet to grow your Crypto
-        side.
+        Signing in with this wallet is coming soon. For now, connect an EVM wallet to grow your
+        Crypto side.
       </div>
       <Link
         href="/services"
@@ -274,7 +278,7 @@ function SignScreen() {
           </div>
           <div className="whitespace-pre-wrap break-words rounded-tile border border-divider bg-panel p-4 font-mono text-[13px] leading-[1.55] text-ink-2">
             {message ||
-              'Pastra asks you to confirm you own this wallet. This request will not start a transaction or cost any fees.'}
+              'Hextra asks you to confirm you own this wallet. This request will not start a transaction or cost any fees.'}
           </div>
         </div>
 
@@ -298,8 +302,8 @@ function SignScreen() {
         </div>
 
         <div className="rounded-tile border-[1.5px] border-dashed border-orange px-4 py-3.5 text-[13px] leading-[1.5] text-ink-2">
-          If your wallet shows a transaction, a token approval or a fee, reject it. Pastra never asks
-          for those.
+          If your wallet shows a transaction, a token approval or a fee, reject it. Hextra never
+          asks for those.
         </div>
 
         {canSign ? (

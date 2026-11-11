@@ -1,7 +1,7 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Pastra logo: the blue tile with a white hexagon and orange shape, used in every app header,
+ * Hextra logo: the blue tile with a white hexagon and orange shape, used in every app header,
  * admin and share image. The card face uses a different mark (docs/architecture.md section 13).
  */
 export function Logo({
@@ -13,9 +13,9 @@ export function Logo({
 }) {
   return (
     <span className="inline-flex items-center gap-2">
-      <img src="/brand/pastra-logo.svg" alt="Pastra" width={size} height={size} />
+      <img src="/brand/pastra-logo.svg" alt="Hextra" width={size} height={size} />
       {withWordmark && (
-        <span className={cn('font-head text-lg font-extrabold tracking-tight')}>Pastra</span>
+        <span className={cn('font-head text-lg font-extrabold tracking-tight')}>Hextra</span>
       )}
     </span>
   );

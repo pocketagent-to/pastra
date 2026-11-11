@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/auth/privy — exchange a Privy access token for a Pastra session (docs/architecture.md
+ * POST /api/auth/privy — exchange a Privy access token for a Hextra session (docs/architecture.md
  * section 11.1). The Privy user id becomes `identities.subject`; sessions stay ours.
  */
 export async function POST(request: Request) {

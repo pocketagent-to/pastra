@@ -2,7 +2,7 @@ import type { ProviderId } from '@pastra/catalog';
 
 /**
  * Map a provider id to its logo file in `public/logos`. `card_spend` has no third-party logo and
- * uses the Pastra mark instead (docs/product-spec.md "Расхождения макета и спецификации").
+ * uses the Hextra mark instead (docs/product-spec.md "Расхождения макета и спецификации").
  */
 export const LOGO_FILE: Partial<Record<ProviderId, string>> = {
   steam: 'steam.png',

@@ -104,33 +104,61 @@ function buildRealAdapters(c: Config): Partial<Record<ProviderId, ProviderAdapte
     try {
       return new URL(c.APP_URL).host;
     } catch {
-      return 'pastra';
+      return 'hextra';
     }
   })();
 
   if (c.STEAM_WEB_API_KEY) real.steam = createSteamAdapter({ webApiKey: c.STEAM_WEB_API_KEY });
   if (c.TWITCH_CLIENT_ID && c.TWITCH_CLIENT_SECRET)
-    real.twitch = createTwitchAdapter({ clientId: c.TWITCH_CLIENT_ID, clientSecret: c.TWITCH_CLIENT_SECRET });
+    real.twitch = createTwitchAdapter({
+      clientId: c.TWITCH_CLIENT_ID,
+      clientSecret: c.TWITCH_CLIENT_SECRET,
+    });
   if (c.LICHESS_CLIENT_ID) real.lichess = createLichessAdapter({ clientId: c.LICHESS_CLIENT_ID });
   if (c.X_CLIENT_ID && c.X_CLIENT_SECRET)
     real.x = createXAdapter({ clientId: c.X_CLIENT_ID, clientSecret: c.X_CLIENT_SECRET });
   if (c.DISCORD_CLIENT_ID && c.DISCORD_CLIENT_SECRET)
-    real.discord = createDiscordAdapter({ clientId: c.DISCORD_CLIENT_ID, clientSecret: c.DISCORD_CLIENT_SECRET });
+    real.discord = createDiscordAdapter({
+      clientId: c.DISCORD_CLIENT_ID,
+      clientSecret: c.DISCORD_CLIENT_SECRET,
+    });
   if (c.GITHUB_CLIENT_ID && c.GITHUB_CLIENT_SECRET)
-    real.github = createGitHubAdapter({ clientId: c.GITHUB_CLIENT_ID, clientSecret: c.GITHUB_CLIENT_SECRET });
+    real.github = createGitHubAdapter({
+      clientId: c.GITHUB_CLIENT_ID,
+      clientSecret: c.GITHUB_CLIENT_SECRET,
+    });
   if (c.TIDAL_CLIENT_ID && c.TIDAL_CLIENT_SECRET)
-    real.tidal = createTidalAdapter({ clientId: c.TIDAL_CLIENT_ID, clientSecret: c.TIDAL_CLIENT_SECRET });
+    real.tidal = createTidalAdapter({
+      clientId: c.TIDAL_CLIENT_ID,
+      clientSecret: c.TIDAL_CLIENT_SECRET,
+    });
   if (c.GOOGLE_CLIENT_ID && c.GOOGLE_CLIENT_SECRET)
-    real.youtube = createYouTubeAdapter({ clientId: c.GOOGLE_CLIENT_ID, clientSecret: c.GOOGLE_CLIENT_SECRET });
+    real.youtube = createYouTubeAdapter({
+      clientId: c.GOOGLE_CLIENT_ID,
+      clientSecret: c.GOOGLE_CLIENT_SECRET,
+    });
   if (c.ANILIST_CLIENT_ID && c.ANILIST_CLIENT_SECRET)
-    real.anilist = createAniListAdapter({ clientId: c.ANILIST_CLIENT_ID, clientSecret: c.ANILIST_CLIENT_SECRET });
-  if (c.APPLE_MUSIC_KEY) real.apple_music = createAppleMusicAdapter({ developerToken: c.APPLE_MUSIC_KEY });
+    real.anilist = createAniListAdapter({
+      clientId: c.ANILIST_CLIENT_ID,
+      clientSecret: c.ANILIST_CLIENT_SECRET,
+    });
+  if (c.APPLE_MUSIC_KEY)
+    real.apple_music = createAppleMusicAdapter({ developerToken: c.APPLE_MUSIC_KEY });
   if (c.POLAR_CLIENT_ID && c.POLAR_CLIENT_SECRET)
-    real.polar = createPolarAdapter({ clientId: c.POLAR_CLIENT_ID, clientSecret: c.POLAR_CLIENT_SECRET });
+    real.polar = createPolarAdapter({
+      clientId: c.POLAR_CLIENT_ID,
+      clientSecret: c.POLAR_CLIENT_SECRET,
+    });
   if (c.WHOOP_CLIENT_ID && c.WHOOP_CLIENT_SECRET)
-    real.whoop = createWhoopAdapter({ clientId: c.WHOOP_CLIENT_ID, clientSecret: c.WHOOP_CLIENT_SECRET });
+    real.whoop = createWhoopAdapter({
+      clientId: c.WHOOP_CLIENT_ID,
+      clientSecret: c.WHOOP_CLIENT_SECRET,
+    });
   if (c.OURA_CLIENT_ID && c.OURA_CLIENT_SECRET)
-    real.oura = createOuraAdapter({ clientId: c.OURA_CLIENT_ID, clientSecret: c.OURA_CLIENT_SECRET });
+    real.oura = createOuraAdapter({
+      clientId: c.OURA_CLIENT_ID,
+      clientSecret: c.OURA_CLIENT_SECRET,
+    });
   if (c.ALCHEMY_KEY)
     real.wallet_evm = createEvmWalletAdapter({
       domain,

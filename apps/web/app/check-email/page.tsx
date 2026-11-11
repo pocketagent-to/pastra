@@ -7,7 +7,7 @@ export default function CheckEmail() {
     <main className="app-shell flex min-h-dvh flex-col">
       <header className="flex min-h-11 items-center gap-2.5 bg-[#16171B] px-5 py-3.5">
         <Logo size={34} />
-        <span className="font-head text-lg font-extrabold tracking-[0.04em]">PASTRA</span>
+        <span className="font-head text-lg font-extrabold tracking-[0.04em]">HEXTRA</span>
       </header>
 
       <div className="flex flex-1 flex-col gap-[22px] px-5 pb-6 pt-7">

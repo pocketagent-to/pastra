@@ -19,7 +19,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { handle } = await params;
   return {
-    title: `${handle} · Pastra`,
+    title: `${handle} · Hextra`,
     description: `${handle}'s pass: LVL ${EXAMPLE_PASS.level}, ${EXAMPLE_PASS.title}.`,
     openGraph: { images: [`/og/${handle}.png`] },
   };

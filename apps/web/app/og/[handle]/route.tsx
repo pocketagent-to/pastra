@@ -65,7 +65,7 @@ export async function GET(_request: Request, ctx: { params: Promise<{ handle: st
           </svg>
         </div>
         <div style={{ marginTop: 40, fontSize: 28, color: '#C7CBD6' }}>
-          pastra · build your pass
+          hextra · build your pass
         </div>
       </div>
     ),
