@@ -3,13 +3,13 @@ import { AXES, catalog, type Axis } from '@pastra/catalog';
 import {
   currentWeek,
   getLivePass,
-  getLiveWeek,
   getUserConnections,
   getUserStamps,
   getVisibility,
 } from '@pastra/core';
 import { computeRarity, type Rarity } from '@pastra/scoring';
 import { getDb } from './server';
+import { getCachedDropAtISO } from './live-week';
 import { getSessionUser } from './session';
 
 type VisLevel = 'everyone' | 'friends' | 'me';
@@ -63,11 +63,11 @@ export async function getPassView(user: {
 }): Promise<PassView> {
   const db = getDb();
   const week = currentWeek();
-  const [snapshot, visRows, stampRows, liveWeek] = await Promise.all([
+  const [snapshot, visRows, stampRows, dropAtISO] = await Promise.all([
     getLivePass(db, user.id, week),
     getVisibility(db, user.id),
     getUserStamps(db, user.id),
-    getLiveWeek(db),
+    getCachedDropAtISO(),
   ]);
 
   const vis = new Map(visRows.map((v) => [v.axis, v.level as VisLevel]));
@@ -95,7 +95,7 @@ export async function getPassView(user: {
     title: snapshot?.title ?? 'Newcomer',
     rarity: computeRarity(level),
     week,
-    nextDropAt: (liveWeek?.dropAt ?? new Date(Date.now() + 3 * 86_400_000)).toISOString(),
+    nextDropAt: dropAtISO ?? new Date(Date.now() + 3 * 86_400_000).toISOString(),
     serverNow: new Date().toISOString(),
     axes,
     keyNumbers: (snapshot?.keyNumbers ?? []) as PassView['keyNumbers'],

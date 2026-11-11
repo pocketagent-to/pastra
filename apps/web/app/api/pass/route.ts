@@ -1,5 +1,6 @@
 import { currentWeek, getLivePass } from '@pastra/core';
 import { getDb } from '@/lib/server';
+import { privateJson } from '@/lib/http';
 import { getSessionUser } from '@/lib/session';
 
 export const runtime = 'nodejs';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const user = await getSessionUser();
   if (!user) {
-    return Response.json(
+    return privateJson(
       { error: { code: 'forbidden', message: 'Not signed in' } },
       { status: 401 },
     );
@@ -17,9 +18,9 @@ export async function GET() {
   const week = currentWeek();
   const snapshot = await getLivePass(getDb(), user.id, week);
   if (!snapshot) {
-    return Response.json({ handle: user.handle, week, empty: true });
+    return privateJson({ handle: user.handle, week, empty: true });
   }
-  return Response.json({
+  return privateJson({
     handle: user.handle,
     week,
     level: snapshot.level,

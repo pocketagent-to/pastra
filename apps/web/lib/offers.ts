@@ -1,5 +1,6 @@
-import { currentWeek, getLiveWeek, getOfferView, getOffersView } from '@pastra/core';
+import { currentWeek, getOfferView, getOffersView } from '@pastra/core';
 import { coreDeps, getDb } from './server';
+import { getCachedDropAtISO } from './live-week';
 
 /** Fallback drop horizon when no week row is live yet (mirrors getPassView in lib/data.ts). */
 const DEFAULT_DROP_MS = 3 * 86_400_000;
@@ -8,11 +9,14 @@ const DEFAULT_DROP_MS = 3 * 86_400_000;
 export async function getOffersScreenData(userId: string) {
   const db = getDb();
   const week = currentWeek();
-  const [offers, liveWeek] = await Promise.all([getOffersView(db, userId, week), getLiveWeek(db)]);
+  const [offers, dropAtISO] = await Promise.all([
+    getOffersView(db, userId, week),
+    getCachedDropAtISO(),
+  ]);
   return {
     offers,
     week,
-    nextDropAt: (liveWeek?.dropAt ?? new Date(Date.now() + DEFAULT_DROP_MS)).toISOString(),
+    nextDropAt: dropAtISO ?? new Date(Date.now() + DEFAULT_DROP_MS).toISOString(),
     serverNow: new Date().toISOString(),
   };
 }

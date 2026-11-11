@@ -12,6 +12,11 @@ import { HEX_AXIS_ORDER } from '@/lib/hexagon';
 import { cn } from '@/lib/cn';
 import { EXAMPLE_PASS, axesValues } from '@/lib/example';
 
+// Public viral surface: identical for all logged-out viewers of a handle, so serve it from the CDN
+// and revalidate every 5 min. This shared cache is valid ONLY for the public projection — keep this
+// page free of cookies()/headers(); any friend/self viewer variant must render in its own route.
+export const revalidate = 300;
+
 export async function generateMetadata({
   params,
 }: {

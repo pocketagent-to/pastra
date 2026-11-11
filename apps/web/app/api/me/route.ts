@@ -1,3 +1,4 @@
+import { privateJson } from '@/lib/http';
 import { getSessionUser } from '@/lib/session';
 
 export const runtime = 'nodejs';
@@ -7,12 +8,12 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const user = await getSessionUser();
   if (!user) {
-    return Response.json(
+    return privateJson(
       { error: { code: 'forbidden', message: 'Not signed in' } },
       { status: 401 },
     );
   }
-  return Response.json({
+  return privateJson({
     handle: user.handle,
     displayName: user.displayName,
     country: user.country,

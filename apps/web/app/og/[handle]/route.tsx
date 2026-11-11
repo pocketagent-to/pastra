@@ -69,6 +69,14 @@ export async function GET(_request: Request, ctx: { params: Promise<{ handle: st
         </div>
       </div>
     ),
-    { width: 1200, height: 675 },
+    {
+      width: 1200,
+      height: 675,
+      // Public share card: let the CDN serve the rendered PNG for a day and refresh in the
+      // background for a week, instead of re-running satori on every crawler/visitor unfurl.
+      headers: {
+        'Cache-Control': 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800',
+      },
+    },
   );
 }
