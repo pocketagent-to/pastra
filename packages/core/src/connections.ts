@@ -1,9 +1,15 @@
 import { and, eq } from 'drizzle-orm';
 import type { Catalog, ProviderId } from '@pastra/catalog';
 import type { Database } from '@pastra/db';
-import { connections, metricExtras, metricValues, syncRuns } from '@pastra/db';
-import { TokenCipher } from '@pastra/crypto';
-import { AdapterError, type AdapterRegistry, type Tokens } from '@pastra/providers';
+import { connections, loginChallenges, metricExtras, metricValues, syncRuns } from '@pastra/db';
+import { TokenCipher, sha256 } from '@pastra/crypto';
+import {
+  AdapterError,
+  pkcePair,
+  randomToken,
+  type AdapterRegistry,
+  type Tokens,
+} from '@pastra/providers';
 import { whatIfDisconnect } from '@pastra/scoring';
 import { CoreError } from './errors';
 import { buildScoringInput } from './scoring-input';
@@ -52,12 +58,14 @@ export async function completeConnection(
     week: string;
     params: Record<string, string>;
     state: string;
+    /** The callback URL registered with the service; required for OAuth token exchange. */
+    redirectUri?: string;
   },
 ): Promise<{ connectionId: string }> {
   const { db, cipher, registry } = deps;
   const adapter = registry.get(params.provider);
   const result = await adapter.complete({
-    redirectUri: '',
+    redirectUri: params.redirectUri ?? '',
     state: params.state,
     params: params.params,
   });
@@ -202,4 +210,49 @@ export async function disconnectPreview(
   if (row.userId !== params.userId) throw new CoreError('forbidden');
   const input = await buildScoringInput(db, catalog, { userId: params.userId, week: params.week });
   return whatIfDisconnect(input, row.provider as ProviderId, catalog);
+}
+
+const CHALLENGE_TTL_MS = 15 * 60 * 1000;
+
+/**
+ * Create a one-time connection challenge (docs/architecture.md section 7, step 1). Stores only the
+ * hash of the opaque `state`; the PKCE verifier and nonce live in the payload. Returns the values
+ * the begin handler needs to build the authorize URL or the wallet message.
+ */
+export async function createConnectionChallenge(
+  db: Database,
+  params: { userId: string; provider: ProviderId; usePkce?: boolean },
+): Promise<{ state: string; nonce: string; codeVerifier?: string; codeChallenge?: string }> {
+  const state = randomToken();
+  const nonce = randomToken(16);
+  const pkce = params.usePkce ? pkcePair() : undefined;
+  await db.insert(loginChallenges).values({
+    kind: 'oauth_state',
+    valueHash: sha256(state),
+    payload: { userId: params.userId, provider: params.provider, nonce, codeVerifier: pkce?.verifier },
+    expiresAt: new Date(Date.now() + CHALLENGE_TTL_MS),
+  });
+  return { state, nonce, codeVerifier: pkce?.verifier, codeChallenge: pkce?.challenge };
+}
+
+/** Consume a connection challenge by its `state`; returns null if unknown, used, or expired. */
+export async function consumeConnectionChallenge(
+  db: Database,
+  state: string,
+): Promise<{ userId: string; provider: ProviderId; nonce?: string; codeVerifier?: string } | null> {
+  const [row] = await db
+    .select()
+    .from(loginChallenges)
+    .where(eq(loginChallenges.valueHash, sha256(state)));
+  if (!row || row.usedAt || row.kind !== 'oauth_state') return null;
+  if (row.expiresAt.getTime() < Date.now()) return null;
+  await db.update(loginChallenges).set({ usedAt: new Date() }).where(eq(loginChallenges.id, row.id));
+  const p = (row.payload ?? {}) as Record<string, unknown>;
+  if (typeof p.userId !== 'string' || typeof p.provider !== 'string') return null;
+  return {
+    userId: p.userId,
+    provider: p.provider as ProviderId,
+    nonce: typeof p.nonce === 'string' ? p.nonce : undefined,
+    codeVerifier: typeof p.codeVerifier === 'string' ? p.codeVerifier : undefined,
+  };
 }

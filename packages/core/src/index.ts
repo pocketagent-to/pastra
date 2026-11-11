@@ -25,7 +25,14 @@ export {
 } from './reads';
 export { buildScoringInput } from './scoring-input';
 export { recompute } from './recompute';
-export { completeConnection, syncConnection, disconnect, disconnectPreview } from './connections';
+export {
+  completeConnection,
+  syncConnection,
+  disconnect,
+  disconnectPreview,
+  createConnectionChallenge,
+  consumeConnectionChallenge,
+} from './connections';
 export { validateOfferRule, selectOffers, activateOffer } from './offers';
 export { prepareWeek, computeDraft, publishDrop } from './drop';
 export { toPublicPass, type PublicPass } from './public-pass';
