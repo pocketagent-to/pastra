@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Axis } from '@pastra/catalog';
 import { AppShell } from '@/components/layout/AppShell';
 import { Hexagon } from '@/components/ui/Hexagon';
-import { DropTimer } from '@/components/ui/DropTimer';
 import { LevelBadge } from '@/components/ui/LevelBadge';
 import { GradientText } from '@/components/ui/GradientText';
 import { KeyNumber } from '@/components/ui/KeyNumber';
@@ -60,8 +59,6 @@ export default async function PassScreen() {
   return (
     <AppShell tab>
       <div className="space-y-5 pt-1">
-        <DropTimer nextDropAt={pass.nextDropAt} serverNow={pass.serverNow} />
-
         <div className="flex flex-col gap-2">
           <div className="flex items-baseline justify-between gap-3">
             <GradientText className="text-[28px] font-extrabold uppercase leading-[1.1]">

@@ -6,7 +6,6 @@ export default function PassLoading() {
   return (
     <AppShell tab>
       <div className="flex min-h-full flex-col gap-5 pt-1">
-        <Skeleton className="h-[150px] rounded-panel" />
         <div className="flex items-center justify-between gap-3">
           <Skeleton className="h-8 w-48 rounded-chip" />
           <Skeleton className="h-7 w-16 rounded-[10px]" />
