@@ -32,6 +32,7 @@ import {
   createWithingsAdapter,
   createFoursquareAdapter,
   createSpotifyAdapter,
+  createTerraAdapter,
   type ProviderAdapter,
 } from '@pastra/providers';
 import { createDb, type Database } from '@pastra/db';
@@ -100,6 +101,8 @@ function providerIsConfigured(id: ProviderId, c: Config): boolean {
       return pair(c.FOURSQUARE_CLIENT_ID, c.FOURSQUARE_CLIENT_SECRET);
     case 'spotify':
       return pair(c.SPOTIFY_CLIENT_ID, c.SPOTIFY_CLIENT_SECRET);
+    case 'terra':
+      return pair(c.TERRA_DEV_ID, c.TERRA_API_KEY);
     default:
       return false;
   }
@@ -247,6 +250,8 @@ function buildRealAdapters(c: Config): Partial<Record<ProviderId, ProviderAdapte
       clientId: c.SPOTIFY_CLIENT_ID,
       clientSecret: c.SPOTIFY_CLIENT_SECRET,
     });
+  if (c.TERRA_DEV_ID && c.TERRA_API_KEY)
+    real.terra = createTerraAdapter({ devId: c.TERRA_DEV_ID, apiKey: c.TERRA_API_KEY });
   return real;
 }
 

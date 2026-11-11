@@ -954,6 +954,50 @@ const sportsConsent = {
   weNever: ['Heart rate', 'Weight', 'Body measurements', 'Routes', 'Raw health records'],
 };
 
+const terra: ProviderSpec = {
+  id: 'terra',
+  name: 'Fitness tracker',
+  axis: 'sports',
+  status: 'live',
+  health: true,
+  syncEveryNthDrop: 1,
+  rateLimit: DEFAULT_RATE,
+  consent: {
+    weRead: ['Workouts and active days', 'Sleep duration'],
+    weNever: ['Heart-rate or medical data', 'Your location'],
+  },
+  metrics: [
+    {
+      key: 'terra.workouts',
+      part: 'volume',
+      scale: 'log',
+      t0: 2,
+      t100: 60,
+      source: 'api',
+      label: 'Workouts (30d)',
+    },
+    {
+      key: 'terra.active_days_30d',
+      part: 'activity',
+      scale: 'linear',
+      t0: 2,
+      t100: 28,
+      source: 'api',
+      label: 'Active days',
+    },
+    {
+      key: 'terra.avg_sleep_hours',
+      part: 'depth',
+      scale: 'linear',
+      t0: 5,
+      t100: 8.5,
+      source: 'api',
+      label: 'Avg sleep (h)',
+    },
+  ],
+  keyNumber: { metric: 'terra.workouts', template: '{value} workouts this month' },
+};
+
 const polar: ProviderSpec = {
   id: 'polar',
   name: 'Polar',
@@ -1334,6 +1378,7 @@ export const PROVIDERS: ProviderSpec[] = [
   anilist,
   myanimelist,
   // Sports
+  terra,
   polar,
   withings,
   whoop,

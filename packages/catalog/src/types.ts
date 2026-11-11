@@ -39,6 +39,7 @@ export type ProviderId =
   | 'anilist'
   | 'myanimelist'
   // Sports
+  | 'terra'
   | 'polar'
   | 'withings'
   | 'whoop'

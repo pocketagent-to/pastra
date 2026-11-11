@@ -52,3 +52,8 @@ export { createMyAnimeListAdapter, type MyAnimeListAdapterConfig } from './adapt
 export { createWithingsAdapter, type WithingsAdapterConfig } from './adapters/withings';
 export { createFoursquareAdapter, type FoursquareAdapterConfig } from './adapters/foursquare';
 export { createSpotifyAdapter, type SpotifyAdapterConfig } from './adapters/spotify';
+export {
+  createTerraAdapter,
+  verifyTerraSignature,
+  type TerraAdapterConfig,
+} from './adapters/terra';

@@ -132,6 +132,11 @@ export const configSchema = z.object({
   FOURSQUARE_CLIENT_SECRET: z.string().default(''),
   SPOTIFY_CLIENT_ID: z.string().default(''),
   SPOTIFY_CLIENT_SECRET: z.string().default(''),
+
+  // Terra — one connector for many cloud wearables (docs/architecture.md section 7).
+  TERRA_DEV_ID: z.string().default(''),
+  TERRA_API_KEY: z.string().default(''),
+  TERRA_SIGNING_SECRET: z.string().default(''),
 });
 
 export type Config = z.infer<typeof configSchema>;
