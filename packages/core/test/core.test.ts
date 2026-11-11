@@ -5,10 +5,12 @@ import { TokenCipher } from '@pastra/crypto';
 import { buildRegistry } from '@pastra/providers';
 import {
   connections,
+  loginChallenges,
   merchants,
   offers,
   passSnapshots,
   recaps,
+  sessions,
   users,
   weeks,
   type Database,
@@ -23,6 +25,7 @@ import {
   disconnectPreview,
   isoWeekString,
   prepareWeek,
+  pruneExpired,
   publishDrop,
   selectOffers,
   syncConnection,
@@ -284,6 +287,39 @@ describe('connection challenges (docs/architecture.md section 7)', () => {
     expect(await consumeConnectionChallenge(db, state)).toBeNull();
     // An unknown state is rejected too.
     expect(await consumeConnectionChallenge(db, 'not-a-real-state')).toBeNull();
+  });
+});
+
+describe('retention sweep', () => {
+  it('deletes expired challenges and sessions and keeps fresh ones', async () => {
+    const userId = await newUser('retention');
+    const past = new Date(Date.now() - 60 * 60 * 1000);
+    const future = new Date(Date.now() + 60 * 60 * 1000);
+    await db.insert(loginChallenges).values([
+      { kind: 'oauth_state', valueHash: 'ret-expired', expiresAt: past },
+      { kind: 'oauth_state', valueHash: 'ret-fresh', expiresAt: future },
+    ]);
+    await db.insert(sessions).values([
+      { userId, tokenHash: 'ret-expired-sess', expiresAt: past },
+      { userId, tokenHash: 'ret-fresh-sess', expiresAt: future },
+    ]);
+
+    const result = await pruneExpired(db);
+    expect(result.loginChallenges).toBeGreaterThanOrEqual(1);
+    expect(result.sessions).toBeGreaterThanOrEqual(1);
+
+    expect(
+      await db.select().from(loginChallenges).where(eq(loginChallenges.valueHash, 'ret-expired')),
+    ).toHaveLength(0);
+    expect(
+      await db.select().from(loginChallenges).where(eq(loginChallenges.valueHash, 'ret-fresh')),
+    ).toHaveLength(1);
+    expect(
+      await db.select().from(sessions).where(eq(sessions.tokenHash, 'ret-expired-sess')),
+    ).toHaveLength(0);
+    expect(
+      await db.select().from(sessions).where(eq(sessions.tokenHash, 'ret-fresh-sess')),
+    ).toHaveLength(1);
   });
 });
 

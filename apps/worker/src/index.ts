@@ -1,14 +1,14 @@
 import { PgBoss } from 'pg-boss';
 import { directDatabaseUrl } from '@pastra/config';
-import { addWeeks, currentWeek } from '@pastra/core';
+import { addWeeks, currentWeek, pruneExpired } from '@pastra/core';
 import { createDeps } from './deps';
 import { runDrop } from './drop-chain';
+import { captureError, logEvent } from './log';
 
 const DROP_QUEUE = 'drop.run';
-
-function log(message: string): void {
-  console.log(`[worker] ${message}`);
-}
+const RETENTION_QUEUE = 'retention.run';
+/** Daily retention sweep at 03:00 UTC (jittered minute). */
+const RETENTION_CRON = '12 3 * * *';
 
 /** Compute the parameters for the drop happening now: the new live week and the one it closes. */
 function dropParams(now: Date = new Date()) {
@@ -18,32 +18,58 @@ function dropParams(now: Date = new Date()) {
 
 async function main(): Promise<void> {
   const deps = createDeps();
-  log(
-    `starting · env=${deps.config.NODE_ENV} · card=${deps.config.CARD_PROVIDER} · providers=${deps.catalog.providers.length}`,
-  );
+  logEvent('worker_start', {
+    env: deps.config.NODE_ENV,
+    card: deps.config.CARD_PROVIDER,
+    providers: deps.catalog.providers.length,
+  });
 
   // One-shot manual drop for staging: `pnpm --filter @pastra/worker start drop`.
   if (process.argv[2] === 'drop') {
+    const started = performance.now();
     const result = await runDrop(deps, dropParams());
-    log(
-      `drop complete · users=${result.users} connections=${result.connections} synced=${result.synced} failed=${result.failed}`,
-    );
+    logEvent('drop_complete', { ...result, durationMs: Math.round(performance.now() - started) });
     process.exit(0);
   }
 
   // pg-boss must use the DIRECT endpoint (LISTEN/NOTIFY, advisory locks) — never the pgbouncer pooler.
   const boss = new PgBoss(directDatabaseUrl(deps.config));
-  boss.on('error', (error: unknown) => log(`pg-boss error: ${(error as Error).message}`));
+  boss.on('error', (error: unknown) => captureError('pg_boss_error', error));
   await boss.start();
   await boss.createQueue(DROP_QUEUE);
+  await boss.createQueue(RETENTION_QUEUE);
 
   await boss.work(DROP_QUEUE, async (jobs: { id: string }[]) => {
     for (const job of jobs) {
       const started = performance.now();
-      const result = await runDrop(deps, dropParams());
-      log(
-        `drop published · job=${job.id} users=${result.users} connections=${result.connections} synced=${result.synced} failed=${result.failed} durationMs=${Math.round(performance.now() - started)}`,
-      );
+      try {
+        const result = await runDrop(deps, dropParams());
+        logEvent('drop_published', {
+          jobId: job.id,
+          ...result,
+          durationMs: Math.round(performance.now() - started),
+        });
+      } catch (error) {
+        captureError('drop_failed', error, { jobId: job.id });
+        throw error; // let pg-boss retry (steps are idempotent)
+      }
+    }
+  });
+
+  await boss.work(RETENTION_QUEUE, async (jobs: { id: string }[]) => {
+    for (const job of jobs) {
+      const started = performance.now();
+      try {
+        const result = await pruneExpired(deps.db);
+        logEvent('retention_done', {
+          jobId: job.id,
+          ...result,
+          durationMs: Math.round(performance.now() - started),
+        });
+      } catch (error) {
+        captureError('retention_failed', error, { jobId: job.id });
+        throw error;
+      }
     }
   });
 
@@ -56,10 +82,11 @@ async function main(): Promise<void> {
     {},
     { tz: deps.config.DROP_TZ, retryLimit: 2, retryBackoff: true, expireInSeconds: 3600 },
   );
-  log(`scheduled drop · cron="${deps.config.DROP_CRON}" tz=${deps.config.DROP_TZ}`);
+  await boss.schedule(RETENTION_QUEUE, RETENTION_CRON, {}, { retryLimit: 2, retryBackoff: true });
+  logEvent('drop_scheduled', { cron: deps.config.DROP_CRON, tz: deps.config.DROP_TZ });
 
   const shutdown = async (signal: string): Promise<void> => {
-    log(`${signal} received, stopping`);
+    logEvent('worker_stopping', { signal });
     await boss.stop({ graceful: true });
     process.exit(0);
   };
@@ -68,6 +95,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  log(`fatal: ${(error as Error).message}`);
+  captureError('worker_fatal', error);
   process.exit(1);
 });
