@@ -94,8 +94,13 @@ All business placeholders (`[FEE]`, `[PARTNER A]`, `[your-domain]`,
 
 ## Notable "next" items
 
-- Wire the app screens from the example seed to live `core` reads behind a data
-  layer (the seam exists); add the Google OAuth and email magic-link routes.
-- Real provider adapters per service (API fields verified against live docs).
+- The worker now builds the **same real adapters as web** (key-gated in
+  `packages/core/adapters.ts`), so the weekly drop syncs real data — not stubs —
+  for every provider whose API keys are set. The public pass page and the
+  `/og` share card render on **live** data (visibility + never-leak applied),
+  with a neutral "build your pass" fallback for handles with no pass.
+- Activate the Privy client SDK for real browser sign-in (see "Enabling Privy").
+- Per-service API fields verified against live credentials (EVM is the
+  reference; ~12 adapters already call live APIs, the rest are scaffolded).
 - The `wirex` `CardProvider` against the sandbox.
 - Friends/admin write paths, data export/delete, rate limiting, monitoring.
