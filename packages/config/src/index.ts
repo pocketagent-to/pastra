@@ -130,6 +130,8 @@ export const configSchema = z.object({
   WITHINGS_CLIENT_SECRET: z.string().default(''),
   FOURSQUARE_CLIENT_ID: z.string().default(''),
   FOURSQUARE_CLIENT_SECRET: z.string().default(''),
+  SPOTIFY_CLIENT_ID: z.string().default(''),
+  SPOTIFY_CLIENT_SECRET: z.string().default(''),
 });
 
 export type Config = z.infer<typeof configSchema>;

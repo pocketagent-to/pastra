@@ -32,6 +32,7 @@ export type ProviderId =
   | 'github'
   | 'linkedin'
   // Music & Entertainment
+  | 'spotify'
   | 'tidal'
   | 'apple_music'
   | 'youtube'

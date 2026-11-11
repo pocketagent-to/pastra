@@ -682,6 +682,51 @@ const linkedin: ProviderSpec = {
 
 // --- Music & Entertainment ------------------------------------------------------------------
 
+const spotify: ProviderSpec = {
+  id: 'spotify',
+  name: 'Spotify',
+  axis: 'music',
+  status: 'live',
+  health: false,
+  syncEveryNthDrop: 1,
+  rateLimit: DEFAULT_RATE,
+  consent: {
+    weRead: ['Saved tracks and playlists', 'Artists you follow'],
+    weNever: ['What you play in real time', 'Your payment info'],
+  },
+  metrics: [
+    {
+      key: 'spotify.saved_tracks',
+      part: 'volume',
+      scale: 'log',
+      t0: 20,
+      t100: 5000,
+      source: 'api',
+      label: 'Saved tracks',
+    },
+    {
+      key: 'spotify.saved_gain_30d',
+      part: 'activity',
+      scale: 'log',
+      t0: 1,
+      t100: 150,
+      source: 'delta_30d',
+      deltaOf: 'spotify.saved_tracks',
+      label: 'Saved (30d)',
+    },
+    {
+      key: 'spotify.following',
+      part: 'depth',
+      scale: 'log',
+      t0: 5,
+      t100: 500,
+      source: 'api',
+      label: 'Artists followed',
+    },
+  ],
+  keyNumber: { metric: 'spotify.saved_tracks', template: '{value} saved tracks' },
+};
+
 const tidal: ProviderSpec = {
   id: 'tidal',
   name: 'TIDAL',
@@ -730,7 +775,7 @@ const appleMusic: ProviderSpec = {
   id: 'apple_music',
   name: 'Apple Music',
   axis: 'music',
-  status: 'coming_soon',
+  status: 'live',
   health: false,
   syncEveryNthDrop: 1,
   rateLimit: DEFAULT_RATE,
@@ -773,7 +818,7 @@ const youtube: ProviderSpec = {
   id: 'youtube',
   name: 'YouTube',
   axis: 'music',
-  status: 'coming_soon',
+  status: 'live',
   health: false,
   syncEveryNthDrop: 1,
   rateLimit: DEFAULT_RATE,
@@ -1282,6 +1327,7 @@ export const PROVIDERS: ProviderSpec[] = [
   github,
   linkedin,
   // Music & Entertainment
+  spotify,
   tidal,
   appleMusic,
   youtube,

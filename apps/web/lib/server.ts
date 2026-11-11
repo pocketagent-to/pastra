@@ -31,6 +31,7 @@ import {
   createMyAnimeListAdapter,
   createWithingsAdapter,
   createFoursquareAdapter,
+  createSpotifyAdapter,
   type ProviderAdapter,
 } from '@pastra/providers';
 import { createDb, type Database } from '@pastra/db';
@@ -97,6 +98,8 @@ function providerIsConfigured(id: ProviderId, c: Config): boolean {
       return pair(c.WITHINGS_CLIENT_ID, c.WITHINGS_CLIENT_SECRET);
     case 'foursquare':
       return pair(c.FOURSQUARE_CLIENT_ID, c.FOURSQUARE_CLIENT_SECRET);
+    case 'spotify':
+      return pair(c.SPOTIFY_CLIENT_ID, c.SPOTIFY_CLIENT_SECRET);
     default:
       return false;
   }
@@ -238,6 +241,11 @@ function buildRealAdapters(c: Config): Partial<Record<ProviderId, ProviderAdapte
     real.foursquare = createFoursquareAdapter({
       clientId: c.FOURSQUARE_CLIENT_ID,
       clientSecret: c.FOURSQUARE_CLIENT_SECRET,
+    });
+  if (c.SPOTIFY_CLIENT_ID && c.SPOTIFY_CLIENT_SECRET)
+    real.spotify = createSpotifyAdapter({
+      clientId: c.SPOTIFY_CLIENT_ID,
+      clientSecret: c.SPOTIFY_CLIENT_SECRET,
     });
   return real;
 }

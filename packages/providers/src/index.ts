@@ -51,3 +51,4 @@ export { createLinkedinAdapter, type LinkedinAdapterConfig } from './adapters/li
 export { createMyAnimeListAdapter, type MyAnimeListAdapterConfig } from './adapters/myAnimeList';
 export { createWithingsAdapter, type WithingsAdapterConfig } from './adapters/withings';
 export { createFoursquareAdapter, type FoursquareAdapterConfig } from './adapters/foursquare';
+export { createSpotifyAdapter, type SpotifyAdapterConfig } from './adapters/spotify';
