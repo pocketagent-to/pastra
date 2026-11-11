@@ -1,16 +1,24 @@
 import type { Metadata, Viewport } from 'next';
 import { inter, unbounded } from '@/lib/fonts';
 import { Providers } from '@/components/auth/Providers';
+import { PwaSetup } from '@/components/pwa/PwaSetup';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Hextra',
   description: 'Your pass: six sides of your life in one hexagon, plus a crypto card.',
+  applicationName: 'HEXTRA',
+  appleWebApp: { capable: true, title: 'HEXTRA', statusBarStyle: 'black-translucent' },
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#05081f',
 };
 
@@ -19,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${unbounded.variable} ${inter.variable}`}>
       <body>
         <Providers appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}>{children}</Providers>
+        <PwaSetup />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn';
+import { InstallBanner } from '@/components/pwa/InstallBanner';
 import { AppHeader } from './AppHeader';
 import { BackHeader } from './BackHeader';
 import { BottomNav } from './BottomNav';
@@ -22,6 +23,7 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-dvh flex-col">
+      <InstallBanner />
       {tab ? <AppHeader /> : <BackHeader title={title ?? ''} back={back} />}
       <main className={cn('app-shell flex-1 px-4 pb-6', className)}>{children}</main>
       {tab && <BottomNav />}

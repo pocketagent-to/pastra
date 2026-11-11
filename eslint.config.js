@@ -15,6 +15,13 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    // Service worker runs in the ServiceWorkerGlobalScope (`self`, not `window`).
+    files: ['**/public/**/*.js'],
+    languageOptions: {
+      globals: { self: 'readonly', clients: 'readonly', caches: 'readonly' },
+    },
+  },
+  {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
