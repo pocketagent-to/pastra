@@ -62,5 +62,6 @@ export async function getPublicPassByHandle(
     visibility,
     viewer,
     stamps,
+    catalog,
   });
 }

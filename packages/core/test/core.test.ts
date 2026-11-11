@@ -357,4 +357,29 @@ describe('utilities', () => {
     expect(pass.keyNumbers).toHaveLength(0); // sports key number hidden
     expect(pass.stamps).toHaveLength(0); // sports stamp hidden
   });
+
+  it('recomputes the public title from visible axes so a private strongest axis cannot leak', () => {
+    const pass = toPublicPass({
+      user: {
+        handle: 'nomad',
+        showLevel: true,
+        showStamps: true,
+        showNumbers: true,
+        showBio: true,
+      },
+      snapshot: {
+        // Sports is the strongest axis but private; the stored title names it ("Athlete").
+        axes: { sports: { score: 80, topPct: 2 }, gaming: { score: 50, topPct: 30 } },
+        level: 27,
+        title: 'Athlete & gamer',
+        keyNumbers: [],
+      },
+      visibility: { sports: 'me', gaming: 'everyone' },
+      viewer: 'public',
+      stamps: [],
+      catalog, // recompute from visible axes
+    });
+    expect(pass.title).toBe('Gamer'); // derived from the visible axis, not the hidden strongest one
+    expect(pass.title).not.toContain('Athlete');
+  });
 });

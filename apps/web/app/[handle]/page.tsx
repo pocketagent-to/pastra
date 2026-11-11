@@ -97,17 +97,14 @@ export default async function PublicPass({ params }: { params: Promise<{ handle:
         </div>
 
         {pass.keyNumbers.length > 0 && (
-          <section className="rounded-panel bg-panel px-4">
+          <section className="rounded-panel bg-panel px-4 py-1.5">
             {pass.keyNumbers.slice(0, 3).map((k, i) => (
               <div
                 key={k.label}
-                className={cn(
-                  'flex items-center justify-between gap-3 py-3.5',
-                  i > 0 && 'border-t border-divider',
-                )}
+                className={cn('flex items-center gap-3 py-3', i > 0 && 'border-t border-divider')}
               >
-                <span className="font-head text-xl font-extrabold text-orange">{k.value}</span>
-                <span className="text-[15px] text-ink-2">{k.label}</span>
+                <span className="w-24 font-head text-[17px] font-bold text-orange">{k.value}</span>
+                <span className="flex-1 text-[14px]">{k.label}</span>
               </div>
             ))}
           </section>

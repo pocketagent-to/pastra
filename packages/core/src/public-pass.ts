@@ -1,5 +1,6 @@
-import type { Axis } from '@pastra/catalog';
+import type { Axis, Catalog } from '@pastra/catalog';
 import { AXES } from '@pastra/catalog';
+import { computeTitle } from '@pastra/scoring';
 
 export type VisibilityLevel = 'everyone' | 'friends' | 'me';
 export type Viewer = 'public' | 'friend' | 'self';
@@ -38,6 +39,10 @@ function canSee(level: VisibilityLevel, viewer: Viewer): boolean {
  * Serialise a pass for a public or friend viewer (docs/product-spec.md section 11, 14). Hidden axes
  * are drawn at zero and marked invisible; their key numbers and stamps are dropped. The output
  * carries no wallet addresses, emails, external ids, card data, friends or offers.
+ *
+ * Pass `catalog` for an untrusted viewer (public/friend): the title is then recomputed from only the
+ * visible axes, so a private strongest axis cannot leak through the title (computeTitle names the
+ * dominant axis). Omit it to keep the stored title verbatim (callers that discard the title).
  */
 export function toPublicPass(params: {
   user: {
@@ -58,8 +63,9 @@ export function toPublicPass(params: {
   visibility: Record<string, VisibilityLevel>;
   viewer: Viewer;
   stamps: Array<{ key: string; label: string; axis: Axis | 'all' }>;
+  catalog?: Catalog;
 }): PublicPass {
-  const { user, snapshot, visibility, viewer, stamps } = params;
+  const { user, snapshot, visibility, viewer, stamps, catalog } = params;
 
   const axes = {} as Record<Axis, PublicAxis>;
   const visibleAxes = new Set<Axis>();
@@ -82,12 +88,21 @@ export function toPublicPass(params: {
     ? stamps.filter((s) => s.axis === 'all' || visibleAxes.has(s.axis))
     : [];
 
+  // Recompute the title from visible axes only (hidden ones already zeroed in `axes`) so a private
+  // strongest axis never surfaces through the title; without a catalog, keep the stored title.
+  const title = catalog
+    ? computeTitle(
+        Object.fromEntries(AXES.map((axis) => [axis, axes[axis].score])) as Record<Axis, number>,
+        catalog,
+      )
+    : snapshot.title;
+
   return {
     handle: user.handle,
     displayName: user.displayName ?? undefined,
     bio: user.showBio ? (user.bio ?? undefined) : undefined,
     level: user.showLevel ? snapshot.level : undefined,
-    title: snapshot.title,
+    title,
     axes,
     keyNumbers,
     stamps: visibleStamps,

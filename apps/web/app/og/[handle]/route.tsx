@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og';
 import { catalog } from '@pastra/catalog';
 import { getPublicPassByHandle } from '@pastra/core';
 import { hexVertex, ringVertex } from '@/lib/hexagon';
-import { axesValues, EXAMPLE_PASS } from '@/lib/example';
 import { getDb } from '@/lib/server';
 
 export const runtime = 'nodejs';
@@ -50,9 +49,9 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
   const { handle } = await ctx.params;
   const name = handle.replace(/\.png$/, '');
   // Live public projection — visibility and the never-leak list are already applied by core, so the
-  // card can only ever show what this handle chose to make public. EXAMPLE_PASS is a dev/preview
-  // fallback for handles with no live pass yet; the real share path (a user's own handle) is live.
-  // A broken image embeds badly on socials, so any DB/config error degrades to the branded card.
+  // card can only ever show what this handle chose to make public, and nothing is ever fabricated.
+  // When there is no live pass (unknown/pass-less handle, or a DB/config error), the card degrades
+  // to a neutral "build your pass" prompt rather than inventing stats under a real-looking handle.
   let live: Awaited<ReturnType<typeof getPublicPassByHandle>> = null;
   try {
     live = await getPublicPassByHandle(getDb(), catalog, name);
@@ -90,15 +89,11 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
   const bodyFont = fonts.some((f) => f.name === 'Inter') ? 'Inter' : 'sans-serif';
 
   // ---- hexagon geometry ----
-  // Per-axis score and whether to print its number. A live pass honours visibility (a hidden axis
-  // collapses to 0 with no number); the example seed honours the share screen's `sports` toggle.
+  // Per-axis score and whether to print its number, from the live projection only. A hidden axis —
+  // or no pass at all — collapses to 0 with no number; a public card never fabricates a score.
   const axisScore = (key: (typeof AXES)[number]['key']): { score: number; showNum: boolean } => {
-    if (live) {
-      const ax = live.axes[key];
-      return { score: ax.visible ? ax.score : 0, showNum: ax.visible };
-    }
-    const hidden = key === 'sports' && !show.has('sports');
-    return { score: hidden ? 0 : axesValues()[key], showNum: !hidden };
+    const ax = live?.axes[key];
+    return { score: ax?.visible ? ax.score : 0, showNum: Boolean(ax?.visible) };
   };
   const axisData = AXES.map((a) => ({ key: a.key, label: a.label, ...axisScore(a.key) }));
   const values = axisData.map((a) => a.score);
@@ -232,18 +227,20 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
     </svg>
   );
 
-  const numbers = (live ? live.keyNumbers : EXAMPLE_PASS.keyNumbers).slice(0, landscape ? 2 : 3);
-  const stamps = (live ? live.stamps : EXAMPLE_PASS.stamps).slice(0, 3);
-  const levelValue = live ? live.level : EXAMPLE_PASS.level;
-  const displayTitle = live ? live.title : EXAMPLE_PASS.title;
+  const numbers = (live?.keyNumbers ?? []).slice(0, landscape ? 2 : 3);
+  const stamps = (live?.stamps ?? []).slice(0, 3);
+  const levelValue = live?.level;
+  // Mirror the public page: show the canonical (lower-cased) handle, not the raw URL casing.
+  const displayHandle = live ? live.handle : name;
+  const displayTitle = live ? live.title : 'Build your pass on HEXTRA';
 
   // Scale the name down for long handles so the LVL badge never overlaps it.
   const nameSize =
-    name.length > 13
+    displayHandle.length > 13
       ? landscape
         ? 42
         : 52
-      : name.length > 10
+      : displayHandle.length > 10
         ? landscape
           ? 50
           : 60
@@ -255,7 +252,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', fontSize: nameSize, fontWeight: 800, fontFamily: head }}>
-          {name}
+          {displayHandle}
         </div>
         {show.has('level') && levelValue != null && (
           <div
