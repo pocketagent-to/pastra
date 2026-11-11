@@ -25,6 +25,13 @@ export {
 } from './reads';
 export { buildScoringInput } from './scoring-input';
 export { recompute } from './recompute';
+export { withAdapterRetry, type RetryOptions } from './retry';
+export {
+  createProviderLimiter,
+  type ProviderLimiter,
+  type RateLimit,
+  type LimiterOptions,
+} from './limiter';
 export {
   completeConnection,
   syncConnection,

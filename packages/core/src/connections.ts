@@ -14,6 +14,7 @@ import { whatIfDisconnect } from '@pastra/scoring';
 import { CoreError } from './errors';
 import { buildScoringInput } from './scoring-input';
 import { recompute } from './recompute';
+import { withAdapterRetry, type RetryOptions } from './retry';
 
 interface Deps {
   db: Database;
@@ -110,7 +111,7 @@ export async function completeConnection(
 /** Fetch a connection's metrics and store them for the week; records the sync run and status. */
 export async function syncConnection(
   deps: Deps,
-  params: { connectionId: string; week: string },
+  params: { connectionId: string; week: string; retry?: RetryOptions },
 ): Promise<{ status: 'ok' | 'failed' }> {
   const { db, cipher, registry } = deps;
   const [row] = await db.select().from(connections).where(eq(connections.id, params.connectionId));
@@ -120,7 +121,11 @@ export async function syncConnection(
 
   try {
     const tokens = decryptTokens(cipher, row);
-    const result = await adapter.fetch({ externalId: row.externalId, tokens });
+    // Retry transient provider failures (rate_limited / provider_down) with capped backoff.
+    const result = await withAdapterRetry(
+      () => adapter.fetch({ externalId: row.externalId, tokens }),
+      params.retry,
+    );
 
     for (const [metricKey, value] of Object.entries(result.metrics)) {
       if (value === null) continue;
