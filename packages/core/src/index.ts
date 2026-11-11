@@ -57,7 +57,8 @@ export {
   type ConnectionSyncRow,
   type UserDropRow,
 } from './drop-queries';
-export { toPublicPass, type PublicPass } from './public-pass';
+export { toPublicPass, type PublicPass, type Viewer } from './public-pass';
+export { getPublicPassByHandle } from './public-view';
 export {
   getOffersView,
   getOfferView,

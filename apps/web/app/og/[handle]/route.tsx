@@ -1,6 +1,9 @@
 import { ImageResponse } from 'next/og';
+import { catalog } from '@pastra/catalog';
+import { getPublicPassByHandle } from '@pastra/core';
 import { hexVertex, ringVertex } from '@/lib/hexagon';
 import { axesValues, EXAMPLE_PASS } from '@/lib/example';
+import { getDb } from '@/lib/server';
 
 export const runtime = 'nodejs';
 
@@ -46,7 +49,16 @@ const round = (n: number) => Math.round(n * 10) / 10;
 export async function GET(request: Request, ctx: { params: Promise<{ handle: string }> }) {
   const { handle } = await ctx.params;
   const name = handle.replace(/\.png$/, '');
-  const pass = EXAMPLE_PASS;
+  // Live public projection — visibility and the never-leak list are already applied by core, so the
+  // card can only ever show what this handle chose to make public. EXAMPLE_PASS is a dev/preview
+  // fallback for handles with no live pass yet; the real share path (a user's own handle) is live.
+  // A broken image embeds badly on socials, so any DB/config error degrades to the branded card.
+  let live: Awaited<ReturnType<typeof getPublicPassByHandle>> = null;
+  try {
+    live = await getPublicPassByHandle(getDb(), catalog, name);
+  } catch {
+    live = null;
+  }
 
   const url = new URL(request.url);
   const v = url.searchParams.get('v');
@@ -78,8 +90,18 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
   const bodyFont = fonts.some((f) => f.name === 'Inter') ? 'Inter' : 'sans-serif';
 
   // ---- hexagon geometry ----
-  const av = axesValues();
-  const values = AXES.map((a) => (a.key === 'sports' && !show.has('sports') ? 0 : av[a.key]));
+  // Per-axis score and whether to print its number. A live pass honours visibility (a hidden axis
+  // collapses to 0 with no number); the example seed honours the share screen's `sports` toggle.
+  const axisScore = (key: (typeof AXES)[number]['key']): { score: number; showNum: boolean } => {
+    if (live) {
+      const ax = live.axes[key];
+      return { score: ax.visible ? ax.score : 0, showNum: ax.visible };
+    }
+    const hidden = key === 'sports' && !show.has('sports');
+    return { score: hidden ? 0 : axesValues()[key], showNum: !hidden };
+  };
+  const axisData = AXES.map((a) => ({ key: a.key, label: a.label, ...axisScore(a.key) }));
+  const values = axisData.map((a) => a.score);
   const valuePts = values.map((s, i) => {
     const vtx = hexVertex(i, s <= 0 ? 0 : Math.max(s, 6));
     return `${round(vtx.x)},${round(vtx.y)}`;
@@ -149,9 +171,8 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
           <circle key={i} cx={round(d.x)} cy={round(d.y)} r={5.5} fill="#FF6B2C" />
         ))}
       </svg>
-      {AXES.map((a, i) => {
+      {axisData.map((a, i) => {
         const pos = labelPos(i);
-        const hideVal = a.key === 'sports' && !show.has('sports');
         return (
           <div
             key={a.key}
@@ -177,9 +198,9 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
             >
               {a.label}
             </div>
-            {!hideVal && (
+            {a.showNum && (
               <div style={{ display: 'flex', fontSize: 26, fontWeight: 800, fontFamily: head }}>
-                {av[a.key]}
+                {a.score}
               </div>
             )}
           </div>
@@ -211,8 +232,10 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
     </svg>
   );
 
-  const numbers = pass.keyNumbers.slice(0, landscape ? 2 : 3);
-  const stamps = pass.stamps.slice(0, 3);
+  const numbers = (live ? live.keyNumbers : EXAMPLE_PASS.keyNumbers).slice(0, landscape ? 2 : 3);
+  const stamps = (live ? live.stamps : EXAMPLE_PASS.stamps).slice(0, 3);
+  const levelValue = live ? live.level : EXAMPLE_PASS.level;
+  const displayTitle = live ? live.title : EXAMPLE_PASS.title;
 
   // Scale the name down for long handles so the LVL badge never overlaps it.
   const nameSize =
@@ -234,7 +257,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
         <div style={{ display: 'flex', fontSize: nameSize, fontWeight: 800, fontFamily: head }}>
           {name}
         </div>
-        {show.has('level') && (
+        {show.has('level') && levelValue != null && (
           <div
             style={{
               display: 'flex',
@@ -248,7 +271,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
               padding: '8px 18px',
             }}
           >
-            {`LVL ${pass.level}`}
+            {`LVL ${levelValue}`}
           </div>
         )}
       </div>
@@ -264,7 +287,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ handle: str
             color: 'transparent',
           }}
         >
-          {pass.title}
+          {displayTitle}
         </div>
       )}
     </div>
