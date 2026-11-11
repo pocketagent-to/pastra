@@ -22,7 +22,10 @@ export function AppShell({
   className?: string;
 }) {
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
+    // Pin the frame to the viewport edges (not a vh/dvh height, which iOS mis-measures in a
+    // standalone PWA and leaves a strip of background below the footer). Header/footer are chrome;
+    // only <main> scrolls.
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
       <InstallBanner />
       {tab ? <AppHeader /> : <BackHeader title={title ?? ''} back={back} />}
       <main
