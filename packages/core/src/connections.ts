@@ -7,6 +7,7 @@ import {
   AdapterError,
   pkcePair,
   randomToken,
+  type AdapterErrorCode,
   type AdapterRegistry,
   type Tokens,
 } from '@pastra/providers';
@@ -112,7 +113,7 @@ export async function completeConnection(
 export async function syncConnection(
   deps: Deps,
   params: { connectionId: string; week: string; retry?: RetryOptions },
-): Promise<{ status: 'ok' | 'failed' }> {
+): Promise<{ status: 'ok' | 'failed'; code?: AdapterErrorCode }> {
   const { db, cipher, registry } = deps;
   const [row] = await db.select().from(connections).where(eq(connections.id, params.connectionId));
   if (!row) throw new CoreError('not_found', 'connection');
@@ -181,7 +182,7 @@ export async function syncConnection(
       errorCode: code,
       durationMs: Math.round(performance.now() - started),
     });
-    return { status: 'failed' };
+    return { status: 'failed', code };
   }
 }
 

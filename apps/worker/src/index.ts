@@ -25,7 +25,9 @@ async function main(): Promise<void> {
   // One-shot manual drop for staging: `pnpm --filter @pastra/worker start drop`.
   if (process.argv[2] === 'drop') {
     const result = await runDrop(deps, dropParams());
-    log(`drop complete · users=${result.users} connections=${result.connections}`);
+    log(
+      `drop complete · users=${result.users} connections=${result.connections} synced=${result.synced} failed=${result.failed}`,
+    );
     process.exit(0);
   }
 
@@ -35,15 +37,25 @@ async function main(): Promise<void> {
   await boss.start();
   await boss.createQueue(DROP_QUEUE);
 
-  await boss.work(DROP_QUEUE, async (jobs: unknown[]) => {
-    for (const _job of jobs) {
+  await boss.work(DROP_QUEUE, async (jobs: { id: string }[]) => {
+    for (const job of jobs) {
+      const started = performance.now();
       const result = await runDrop(deps, dropParams());
-      log(`drop published · users=${result.users} connections=${result.connections}`);
+      log(
+        `drop published · job=${job.id} users=${result.users} connections=${result.connections} synced=${result.synced} failed=${result.failed} durationMs=${Math.round(performance.now() - started)}`,
+      );
     }
   });
 
   // Schedule the weekly drop (Monday 13:00 Europe/Warsaw by default, docs/architecture.md section 9).
-  await boss.schedule(DROP_QUEUE, deps.config.DROP_CRON, {}, { tz: deps.config.DROP_TZ });
+  // expireInSeconds raises the 15-min default lease so the long drop job is not marked expired;
+  // retryBackoff retries a transient failure a couple of times (the steps are idempotent).
+  await boss.schedule(
+    DROP_QUEUE,
+    deps.config.DROP_CRON,
+    {},
+    { tz: deps.config.DROP_TZ, retryLimit: 2, retryBackoff: true, expireInSeconds: 3600 },
+  );
   log(`scheduled drop · cron="${deps.config.DROP_CRON}" tz=${deps.config.DROP_TZ}`);
 
   const shutdown = async (signal: string): Promise<void> => {

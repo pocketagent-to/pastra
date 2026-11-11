@@ -47,7 +47,14 @@ export {
   listActiveOffers,
   type OfferRow,
 } from './offers';
-export { prepareWeek, computeDraft, publishDrop } from './drop';
+export { prepareWeek, computeDraft, promoteWeek, writeRecaps, publishDrop } from './drop';
+export {
+  pageConnectionsForSync,
+  pageUsersForDrop,
+  pageUserIds,
+  type ConnectionSyncRow,
+  type UserDropRow,
+} from './drop-queries';
 export { toPublicPass, type PublicPass } from './public-pass';
 export {
   getOffersView,

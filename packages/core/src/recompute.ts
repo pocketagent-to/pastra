@@ -13,19 +13,14 @@ function topPctMap(result: PassResult): Record<string, number | null> {
 }
 
 /**
- * Recompute a user's pass for a week and persist it (docs/architecture.md section 7, 8). Writes the
- * snapshot in the given state, carries the peak points forward (level only grows) and applies the
- * stamp delta. Called immediately after connect/disconnect (`live`) and during the drop (`draft`).
+ * Persist a computed pass as a snapshot (upsert on user+week+state) and carry peak points forward.
+ * Shared by the single-user recompute and the batched draft compute, so both write identically.
  */
-export async function recompute(
+export async function persistSnapshot(
   db: Database,
-  catalog: Catalog,
-  params: { userId: string; week: string; state?: 'draft' | 'live' },
-): Promise<PassResult> {
-  const { userId, week, state = 'live' } = params;
-  const input = await buildScoringInput(db, catalog, { userId, week });
-  const result = computePass(input, catalog);
-
+  params: { userId: string; week: string; state: 'draft' | 'live'; result: PassResult },
+): Promise<void> {
+  const { userId, week, state, result } = params;
   await db
     .insert(passSnapshots)
     .values({
@@ -51,8 +46,24 @@ export async function recompute(
         computedAt: new Date(),
       },
     });
-
   await db.update(users).set({ peakPoints: result.peakPoints }).where(eq(users.id, userId));
+}
+
+/**
+ * Recompute a user's pass for a week and persist it (docs/architecture.md section 7, 8). Writes the
+ * snapshot in the given state, carries the peak points forward (level only grows) and applies the
+ * stamp delta. Called immediately after connect/disconnect (`live`) and during the drop (`draft`).
+ */
+export async function recompute(
+  db: Database,
+  catalog: Catalog,
+  params: { userId: string; week: string; state?: 'draft' | 'live' },
+): Promise<PassResult> {
+  const { userId, week, state = 'live' } = params;
+  const input = await buildScoringInput(db, catalog, { userId, week });
+  const result = computePass(input, catalog);
+
+  await persistSnapshot(db, { userId, week, state, result });
 
   // Stamps are awarded on the live pass only; the drop's draft never hands out stamps early.
   if (state !== 'live') return result;
