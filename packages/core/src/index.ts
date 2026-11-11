@@ -80,3 +80,5 @@ export {
   type IdentitySummary,
 } from './settings';
 export { buildExport, requestDeletion, type AccountExport } from './account';
+export { getConnectionProgress, type ConnectionProgress } from './connection-progress';
+export { activateUserOffer, type OfferActionResult } from './offer-actions';

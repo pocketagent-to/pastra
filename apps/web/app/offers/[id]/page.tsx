@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
-import { PromoCode } from '@/components/ui/PromoCode';
 import { AXIS_SHORT } from '@/lib/axes';
 import { requireUser } from '@/lib/data';
 import { getOfferDetail } from '@/lib/offers';
+import { ActivateOfferButton } from './ActivateOfferButton';
+import { PromoCodePanel } from './PromoCodePanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
             )}
           </div>
 
-          <PromoCode code={offer.code} variant="box" />
+          <PromoCodePanel offerId={offer.id} code={offer.code} />
 
           <div className="flex flex-col rounded-panel bg-panel px-4 py-1">
             <div className="flex min-h-12 items-center text-sm">
@@ -119,13 +120,7 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
         <p className="text-[13px] leading-relaxed text-ink-3">{offer.terms}</p>
 
         <div className="mt-auto flex flex-col gap-2.5">
-          <Link
-            href="#activate"
-            className="flex h-14 items-center justify-center rounded-button font-head text-sm font-bold uppercase tracking-[0.03em] text-on-orange"
-            style={{ background: 'var(--grad-button)' }}
-          >
-            Activate
-          </Link>
+          <ActivateOfferButton offerId={offer.id} state={offer.state} />
           <p className="text-center text-[13px] leading-relaxed text-ink-3">
             The partner sees a card payment, nothing else. They never get your data.
           </p>
