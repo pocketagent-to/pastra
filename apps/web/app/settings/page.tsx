@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
-import { Toggle } from '@/components/ui/Toggle';
+import { requireUser } from '@/lib/data';
+import { PreferenceToggle } from './PreferenceToggle';
+
+export const dynamic = 'force-dynamic';
 
 function RowArrow() {
   return (
@@ -22,7 +25,8 @@ function RowArrow() {
 }
 
 /** G1 · Settings (docs/product-spec.md section 12). */
-export default function SettingsScreen() {
+export default async function SettingsScreen() {
+  const user = await requireUser();
   return (
     <AppShell back="/pass" title="Settings">
       <div className="flex flex-col gap-6 pt-2">
@@ -59,15 +63,27 @@ export default function SettingsScreen() {
                 <span className="text-[15px]">Offers based on my activity</span>
                 <span className="text-xs text-ink-3">Partners never see your data</span>
               </span>
-              <Toggle label="Offers based on my activity" defaultOn />
+              <PreferenceToggle
+                field="offersConsent"
+                label="Offers based on my activity"
+                defaultOn={user.offersConsent}
+              />
             </div>
             <div className="flex min-h-[52px] items-center justify-between gap-3">
               <span className="text-[15px]">Weekly drop in Telegram</span>
-              <Toggle label="Weekly drop in Telegram" defaultOn />
+              <PreferenceToggle
+                field="notifyTelegram"
+                label="Weekly drop in Telegram"
+                defaultOn={user.notifyTelegram}
+              />
             </div>
             <div className="flex min-h-[52px] items-center justify-between gap-3">
               <span className="text-[15px]">Weekly drop by email</span>
-              <Toggle label="Weekly drop by email" />
+              <PreferenceToggle
+                field="notifyEmail"
+                label="Weekly drop by email"
+                defaultOn={user.notifyEmail}
+              />
             </div>
           </div>
         </section>

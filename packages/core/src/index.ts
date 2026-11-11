@@ -65,3 +65,18 @@ export {
   type CompareSide,
   type CompareView,
 } from './friends';
+export {
+  setVisibility,
+  updateProfile,
+  updatePreferences,
+  getIdentities,
+  VISIBILITY_LEVELS,
+  MAX_BIO_LENGTH,
+  MAX_DISPLAY_NAME_LENGTH,
+  type VisibilityLevel,
+  type ProfileInput,
+  type PreferencesInput,
+  type IdentityKindName,
+  type IdentitySummary,
+} from './settings';
+export { buildExport, requestDeletion, type AccountExport } from './account';
