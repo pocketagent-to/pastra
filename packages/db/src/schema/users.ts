@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -53,7 +54,11 @@ export const identities = pgTable(
     verifiedAt: timestamp('verified_at', { withTimezone: true }),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex('identities_kind_subject_idx').on(t.kind, t.subject)],
+  (t) => [
+    uniqueIndex('identities_kind_subject_idx').on(t.kind, t.subject),
+    // Settings "sign-in methods" lists a user's identities.
+    index('identities_user_idx').on(t.userId),
+  ],
 );
 
 /** Sessions: the cookie holds a random token; the DB stores its SHA-256 hash. */
@@ -68,19 +73,31 @@ export const sessions = pgTable(
     userAgent: text('user_agent'),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex('sessions_token_hash_idx').on(t.tokenHash)],
+  (t) => [
+    uniqueIndex('sessions_token_hash_idx').on(t.tokenHash),
+    // Supports the retention sweep that deletes expired sessions.
+    index('sessions_expires_idx').on(t.expiresAt),
+  ],
 );
 
 /** One-time challenges (email links, OAuth state, wallet nonces), 15-minute lifetime. */
-export const loginChallenges = pgTable('login_challenges', {
-  id: pk(),
-  kind: text('kind').$type<'email_link' | 'oauth_state' | 'wallet_nonce'>().notNull(),
-  valueHash: text('value_hash').notNull(),
-  payload: jsonb('payload').$type<Record<string, unknown>>(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  usedAt: timestamp('used_at', { withTimezone: true }),
-  createdAt: createdAt(),
-});
+export const loginChallenges = pgTable(
+  'login_challenges',
+  {
+    id: pk(),
+    kind: text('kind').$type<'email_link' | 'oauth_state' | 'wallet_nonce'>().notNull(),
+    valueHash: text('value_hash').notNull(),
+    payload: jsonb('payload').$type<Record<string, unknown>>(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  // Every OAuth/email/wallet callback looks up by value_hash; expires_at drives the retention sweep.
+  (t) => [
+    index('login_challenges_value_hash_idx').on(t.valueHash),
+    index('login_challenges_expires_idx').on(t.expiresAt),
+  ],
+);
 
 /** Append-only consent journal (docs/product-spec.md section 14). */
 export const consents = pgTable('consents', {

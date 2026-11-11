@@ -40,16 +40,24 @@ export const passSnapshots = pgTable(
 );
 
 /** Stamps. Service stamps are revoked on disconnect; achievement stamps are permanent. */
-export const stamps = pgTable('stamps', {
-  id: pk(),
-  userId: ref('user_id').notNull(),
-  stampKey: text('stamp_key').notNull(),
-  tier: integer('tier'),
-  awardedWeek: text('awarded_week'),
-  revokedAt: timestamp('revoked_at', { withTimezone: true }),
-  sourceConnectionId: ref('source_connection_id'),
-  createdAt: createdAt(),
-});
+export const stamps = pgTable(
+  'stamps',
+  {
+    id: pk(),
+    userId: ref('user_id').notNull(),
+    stampKey: text('stamp_key').notNull(),
+    tier: integer('tier'),
+    awardedWeek: text('awarded_week'),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    sourceConnectionId: ref('source_connection_id'),
+    createdAt: createdAt(),
+  },
+  // Every pass recompute filters stamps by user (scoring-input, stamps view, recap, export).
+  (t) => [
+    index('stamps_user_idx').on(t.userId),
+    index('stamps_user_week_idx').on(t.userId, t.awardedWeek),
+  ],
+);
 
 /** Weekly recap, assembled at the drop from two adjacent snapshots. */
 export const recaps = pgTable('recaps', {
@@ -82,16 +90,22 @@ export const friendships = pgTable(
     rewarded: boolean('rewarded').notNull().default(false),
     createdAt: createdAt(),
   },
-  (t) => [primaryKey({ columns: [t.userA, t.userB] })],
+  // PK (user_a, user_b) serves the user_a side; the OR-query also filters by user_b.
+  (t) => [primaryKey({ columns: [t.userA, t.userB] }), index('friendships_user_b_idx').on(t.userB)],
 );
 
 /** Invites: the source of friend rewards and the "hasn't joined yet" rows. */
-export const invites = pgTable('invites', {
-  id: pk(),
-  inviterId: ref('inviter_id').notNull(),
-  inviteeId: ref('invitee_id'),
-  joinedAt: timestamp('joined_at', { withTimezone: true }),
-  firstConnectAt: timestamp('first_connect_at', { withTimezone: true }),
-  lastRemindedAt: timestamp('last_reminded_at', { withTimezone: true }),
-  createdAt: createdAt(),
-});
+export const invites = pgTable(
+  'invites',
+  {
+    id: pk(),
+    inviterId: ref('inviter_id').notNull(),
+    inviteeId: ref('invitee_id'),
+    joinedAt: timestamp('joined_at', { withTimezone: true }),
+    firstConnectAt: timestamp('first_connect_at', { withTimezone: true }),
+    lastRemindedAt: timestamp('last_reminded_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  // Friends screen + invite creation look up by inviter.
+  (t) => [index('invites_inviter_idx').on(t.inviterId)],
+);

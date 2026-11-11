@@ -8,6 +8,13 @@
       "when": 1794320518324,
       "tag": "0000_wealthy_maddog",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794413149912,
+      "tag": "0001_graceful_carlie_cooper",
+      "breakpoints": true
     }
   ]
 }

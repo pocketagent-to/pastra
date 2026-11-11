@@ -52,7 +52,11 @@ export const metricValues = pgTable(
     week: text('week').notNull(),
     fetchedAt: timestamp('fetched_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.connectionId, t.metricKey, t.week] })],
+  // Scoring reads filter by (connection_id, week); week is third in the PK, so index it directly.
+  (t) => [
+    primaryKey({ columns: [t.connectionId, t.metricKey, t.week] }),
+    index('metric_values_connection_week_idx').on(t.connectionId, t.week),
+  ],
 );
 
 /** Non-numeric extras for display (top game, first-tx year, hashed Discord server ids). */
@@ -66,19 +70,27 @@ export const metricExtras = pgTable(
     value: jsonb('value').$type<unknown>(),
     week: text('week').notNull(),
   },
-  (t) => [primaryKey({ columns: [t.connectionId, t.key, t.week] })],
+  (t) => [
+    primaryKey({ columns: [t.connectionId, t.key, t.week] }),
+    index('metric_extras_connection_week_idx').on(t.connectionId, t.week),
+  ],
 );
 
 /** Sync log for monitoring. Cascade-deleted with the connection. */
-export const syncRuns = pgTable('sync_runs', {
-  id: pk(),
-  connectionId: ref('connection_id')
-    .notNull()
-    .references(() => connections.id, { onDelete: 'cascade' }),
-  week: text('week').notNull(),
-  status: text('status').$type<'ok' | 'failed' | 'skipped'>().notNull(),
-  attempt: integer('attempt').notNull().default(1),
-  errorCode: text('error_code'),
-  durationMs: integer('duration_ms'),
-  createdAt: createdAt(),
-});
+export const syncRuns = pgTable(
+  'sync_runs',
+  {
+    id: pk(),
+    connectionId: ref('connection_id')
+      .notNull()
+      .references(() => connections.id, { onDelete: 'cascade' }),
+    week: text('week').notNull(),
+    status: text('status').$type<'ok' | 'failed' | 'skipped'>().notNull(),
+    attempt: integer('attempt').notNull().default(1),
+    errorCode: text('error_code'),
+    durationMs: integer('duration_ms'),
+    createdAt: createdAt(),
+  },
+  // Serves the progress poll (connection_id, week) and the connection cascade delete.
+  (t) => [index('sync_runs_connection_week_idx').on(t.connectionId, t.week)],
+);

@@ -40,14 +40,19 @@ export const offers = pgTable('offers', {
 });
 
 /** Pool of personal promo codes, encrypted; assigned on first reveal. */
-export const offerCodes = pgTable('offer_codes', {
-  id: pk(),
-  offerId: ref('offer_id').notNull(),
-  codeEnc: text('code_enc').notNull(),
-  assignedUserId: ref('assigned_user_id'),
-  assignedWeek: text('assigned_week'),
-  createdAt: createdAt(),
-});
+export const offerCodes = pgTable(
+  'offer_codes',
+  {
+    id: pk(),
+    offerId: ref('offer_id').notNull(),
+    codeEnc: text('code_enc').notNull(),
+    assignedUserId: ref('assigned_user_id'),
+    assignedWeek: text('assigned_week'),
+    createdAt: createdAt(),
+  },
+  // Promo reveal looks up by offer + assignee, and probes free codes (assigned_user_id IS NULL).
+  (t) => [index('offer_codes_offer_assigned_idx').on(t.offerId, t.assignedUserId)],
+);
 
 /** A user's offers for a week with their state and the "because you…" reason. */
 export const userOffers = pgTable(
