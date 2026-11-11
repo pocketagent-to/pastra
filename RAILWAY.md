@@ -150,6 +150,49 @@ A healthy `web` responds on `GET /api/health` with `{"ok":true}`. A healthy `wor
 
 ---
 
+## 6. CI/CD from GitHub
+
+The repo ships a GitHub Actions CI pipeline (`.github/workflows/ci.yml`) that runs on every push to
+`main` and every pull request: **format check → lint → typecheck → unit tests → build**. No secrets
+are needed; it never touches the database.
+
+For **CD**, use Railway's native GitHub integration (set up in step 2 when you create each service
+from the repo) — Railway watches the connected branch and redeploys `web` and `worker` on every push.
+To make deploys wait for CI to pass first:
+
+> Each service → **Settings → Deploys → Wait for CI**: enable it. Railway then holds the deploy until
+> the GitHub checks (the Actions CI above) go green, so a red build never ships. This keeps the whole
+> flow in GitHub with **no deploy token stored anywhere**.
+
+That is the recommended setup: push to GitHub → Actions validates → Railway deploys on green.
+
+<details>
+<summary>Alternative: deploy from GitHub Actions instead of Railway's integration</summary>
+
+If you would rather drive the deploy from Actions (e.g. to gate it on a specific job), create a
+Railway **project token** and add it as the repo secret `RAILWAY_TOKEN`, then add a job that runs
+after `build`:
+
+```yaml
+deploy:
+  needs: build
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  env:
+    RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  steps:
+    - uses: actions/checkout@v4
+    - run: npm i -g @railway/cli
+    - run: railway up --service web --ci
+    - run: railway up --service worker --ci
+```
+
+Disable Railway's native auto-deploy on the services if you use this, so they don't both deploy.
+
+</details>
+
+---
+
 ## Notes & troubleshooting
 
 - **Migrations as a one-off:** if you prefer not to run them on every deploy, drop
