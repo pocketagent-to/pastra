@@ -59,6 +59,7 @@ export {
 } from './drop-queries';
 export { toPublicPass, type PublicPass, type Viewer } from './public-pass';
 export { getPublicPassByHandle } from './public-view';
+export { joinCardWaitlist, isOnCardWaitlist } from './card-waitlist';
 export {
   getOffersView,
   getOfferView,

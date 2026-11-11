@@ -28,6 +28,16 @@ export const cardAccounts = pgTable('card_accounts', {
   createdAt: createdAt(),
 });
 
+/**
+ * Beta-access waitlist for the card. The card is not live yet (Wirex pending), so `/card` shows a
+ * coming-soon screen; a signed-in user applies to be an early tester and this records that interest.
+ * One row per user (idempotent join). No card details or personal data beyond the user reference.
+ */
+export const cardWaitlist = pgTable('card_waitlist', {
+  userId: ref('user_id').primaryKey(),
+  createdAt: createdAt(),
+});
+
 /** Incoming card webhooks; the unique provider event id gives idempotency. */
 export const cardEvents = pgTable(
   'card_events',

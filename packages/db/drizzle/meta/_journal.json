@@ -22,6 +22,13 @@
       "when": 1794413294268,
       "tag": "0002_curly_the_call",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794439347826,
+      "tag": "0003_card_waitlist",
+      "breakpoints": true
     }
   ]
 }

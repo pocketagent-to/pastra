@@ -23,7 +23,9 @@ import {
   createConnectionChallenge,
   disconnect,
   disconnectPreview,
+  isOnCardWaitlist,
   isoWeekString,
+  joinCardWaitlist,
   prepareWeek,
   pruneExpired,
   publishDrop,
@@ -381,5 +383,13 @@ describe('utilities', () => {
     });
     expect(pass.title).toBe('Gamer'); // derived from the visible axis, not the hidden strongest one
     expect(pass.title).not.toContain('Athlete');
+  });
+
+  it('joins the card beta waitlist idempotently', async () => {
+    const userId = await newUser('cardfan');
+    expect(await isOnCardWaitlist(db, userId)).toBe(false);
+    expect(await joinCardWaitlist(db, userId)).toBe(true); // this call added them
+    expect(await isOnCardWaitlist(db, userId)).toBe(true);
+    expect(await joinCardWaitlist(db, userId)).toBe(false); // already on the list
   });
 });
