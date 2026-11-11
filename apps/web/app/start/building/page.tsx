@@ -1,20 +1,60 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/brand/Logo';
 import { cn } from '@/lib/cn';
 
 const STEPS = ['Hours played', 'Games owned', 'Recent activity', 'Achievements', 'Account age'];
 
+interface Progress {
+  status: 'pending' | 'ok' | 'failed' | 'skipped';
+  metricsFound: string[];
+  done: boolean;
+}
+
 /** A8 · Building the pass — found metrics appear one by one (docs/product-spec.md section 12). */
-export default function Building() {
+function Building() {
+  const search = useSearchParams();
+  const connectionId = search.get('c');
   const [found, setFound] = useState(0);
+  const [done, setDone] = useState(false);
+
+  // No connection id: keep the original timed progressive-reveal visuals.
   useEffect(() => {
-    if (found >= STEPS.length) return;
+    if (connectionId || found >= STEPS.length) return;
     const id = setTimeout(() => setFound((n) => n + 1), 700);
     return () => clearTimeout(id);
-  }, [found]);
+  }, [connectionId, found]);
+
+  // Connection id present: poll the real sync progress and reveal as metrics land.
+  useEffect(() => {
+    if (!connectionId || done) return;
+    let active = true;
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/connections/${encodeURIComponent(connectionId)}/progress`, {
+          cache: 'no-store',
+        });
+        if (!res.ok || !active) return;
+        const p = (await res.json()) as Progress;
+        if (!active) return;
+        setFound((n) => Math.min(STEPS.length, Math.max(n, p.done ? STEPS.length : p.metricsFound.length)));
+        if (p.done) setDone(true);
+      } catch {
+        /* ignore transient poll errors; the next tick retries */
+      }
+    };
+
+    void poll();
+    const id = setInterval(poll, 900);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, [connectionId, done]);
 
   const pct = Math.round((found / STEPS.length) * 100);
 
@@ -80,7 +120,7 @@ export default function Building() {
 
         <div className="flex flex-col rounded-panel bg-panel px-4 py-1.5">
           {STEPS.map((label, i) => {
-            const done = i < found;
+            const isDone = i < found;
             return (
               <div
                 key={label}
@@ -89,7 +129,7 @@ export default function Building() {
                   i > 0 && 'border-t border-divider',
                 )}
               >
-                {done ? (
+                {isDone ? (
                   <svg
                     viewBox="0 0 20 20"
                     width={20}
@@ -119,7 +159,7 @@ export default function Building() {
                     <path d="M10 3a7 7 0 1 0 7 7" />
                   </svg>
                 )}
-                <span className={cn('text-sm', done ? 'text-ink' : 'text-ink-2')}>{label}</span>
+                <span className={cn('text-sm', isDone ? 'text-ink' : 'text-ink-2')}>{label}</span>
               </div>
             );
           })}
@@ -148,5 +188,14 @@ export default function Building() {
         </p>
       </main>
     </div>
+  );
+}
+
+/** Wrapped in Suspense because the inner screen reads the connection id from the query. */
+export default function BuildingPage() {
+  return (
+    <Suspense fallback={<div className="app-shell min-h-dvh" />}>
+      <Building />
+    </Suspense>
   );
 }
