@@ -189,7 +189,8 @@ export function createPolarAdapter(cfg: PolarAdapterConfig): ProviderAdapter {
       // AccessLink token endpoint uses HTTP Basic client authentication (client_secret_basic).
       basicAuthHeader(clientId, clientSecret),
     );
-    if (!token.access_token) throw new AdapterError('unexpected_response', 'No access token returned');
+    if (!token.access_token)
+      throw new AdapterError('unexpected_response', 'No access token returned');
     if (token.x_user_id === undefined || token.x_user_id === null)
       throw new AdapterError('unexpected_response', 'Polar returned no user id');
 
@@ -266,7 +267,10 @@ export function createPolarAdapter(cfg: PolarAdapterConfig): ProviderAdapter {
     scopes: [...SCOPES],
     clientAuth: 'basic',
     identify: async () => {
-      throw new AdapterError('unexpected_response', 'Polar resolves the account id during complete');
+      throw new AdapterError(
+        'unexpected_response',
+        'Polar resolves the account id during complete',
+      );
     },
     fetchMetrics,
   });

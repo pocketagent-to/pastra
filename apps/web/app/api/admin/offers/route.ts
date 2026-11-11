@@ -30,7 +30,8 @@ function toInput(body: Record<string, unknown>): OfferInput {
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return Response.json({ error: { code: 'forbidden' } }, { status: 401 });
-  if (!isAdmin(getConfig(), user)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
+  if (!isAdmin(getConfig(), user))
+    return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   try {

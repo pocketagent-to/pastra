@@ -8,10 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const user = await getSessionUser();
   if (!user) {
-    return privateJson(
-      { error: { code: 'forbidden', message: 'Not signed in' } },
-      { status: 401 },
-    );
+    return privateJson({ error: { code: 'forbidden', message: 'Not signed in' } }, { status: 401 });
   }
   return privateJson({
     handle: user.handle,

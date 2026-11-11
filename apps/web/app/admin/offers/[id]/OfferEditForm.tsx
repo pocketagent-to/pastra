@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { Condition } from '@pastra/catalog';
+import type { Axis, Condition, ProviderId } from '@pastra/catalog';
 import type { AdminOffer, OfferCodeMode } from '@pastra/core';
 
 const labelCls = 'text-[13px] font-semibold text-ink-2';
@@ -67,13 +67,16 @@ function splitRule(
   const extra: Condition[] = [];
   let id = 0;
   for (const c of rule?.all ?? []) {
-    if (c.kind === 'connected') rows.push({ id: id++, kind: 'connected', target: c.provider, value: 'yes' });
+    if (c.kind === 'connected')
+      rows.push({ id: id++, kind: 'connected', target: c.provider, value: 'yes' });
     else if (c.kind === 'metric_gte')
       rows.push({ id: id++, kind: 'metric_gte', target: c.metric, value: String(c.value) });
     else if (c.kind === 'axis_gte')
       rows.push({ id: id++, kind: 'axis_gte', target: c.axis, value: String(c.value) });
-    else if (c.kind === 'level_gte') rows.push({ id: id++, kind: 'level_gte', target: '', value: String(c.value) });
-    else if (c.kind === 'has_card') rows.push({ id: id++, kind: 'has_card', target: '', value: 'yes' });
+    else if (c.kind === 'level_gte')
+      rows.push({ id: id++, kind: 'level_gte', target: '', value: String(c.value) });
+    else if (c.kind === 'has_card')
+      rows.push({ id: id++, kind: 'has_card', target: '', value: 'yes' });
     else extra.push(c);
   }
   void opts;
@@ -90,13 +93,15 @@ function defaultTarget(kind: CondKind, opts: Options): string {
 function toCondition(row: CondRow): Condition | null {
   switch (row.kind) {
     case 'connected':
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return row.target ? { kind: 'connected', provider: row.target as any } : null;
+      return row.target ? { kind: 'connected', provider: row.target as ProviderId } : null;
     case 'metric_gte':
-      return row.target ? { kind: 'metric_gte', metric: row.target, value: Number(row.value) || 0 } : null;
+      return row.target
+        ? { kind: 'metric_gte', metric: row.target, value: Number(row.value) || 0 }
+        : null;
     case 'axis_gte':
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return row.target ? { kind: 'axis_gte', axis: row.target as any, value: Number(row.value) || 0 } : null;
+      return row.target
+        ? { kind: 'axis_gte', axis: row.target as Axis, value: Number(row.value) || 0 }
+        : null;
     case 'level_gte':
       return { kind: 'level_gte', value: Number(row.value) || 0 };
     case 'has_card':
@@ -156,7 +161,11 @@ export function OfferEditForm({
   }
 
   function changeKind(id: number, kind: CondKind) {
-    setRow(id, { kind, target: defaultTarget(kind, options), value: kind === 'has_card' ? 'yes' : '' });
+    setRow(id, {
+      kind,
+      target: defaultTarget(kind, options),
+      value: kind === 'has_card' ? 'yes' : '',
+    });
   }
 
   function addRow() {
@@ -233,7 +242,8 @@ export function OfferEditForm({
 
   const condTargetOptions = (kind: CondKind) => {
     if (kind === 'connected') return options.providers.map((p) => ({ value: p.id, label: p.name }));
-    if (kind === 'metric_gte') return options.metrics.map((m) => ({ value: m.key, label: m.label }));
+    if (kind === 'metric_gte')
+      return options.metrics.map((m) => ({ value: m.key, label: m.label }));
     if (kind === 'axis_gte') return options.axes.map((a) => ({ value: a.code, label: a.label }));
     return [];
   };
@@ -307,7 +317,12 @@ export function OfferEditForm({
             <label htmlFor="ao-a" className={labelCls}>
               Side
             </label>
-            <select id="ao-a" value={side} onChange={(e) => setSide(e.target.value)} className={controlCls}>
+            <select
+              id="ao-a"
+              value={side}
+              onChange={(e) => setSide(e.target.value)}
+              className={controlCls}
+            >
               {SIDE_OPTIONS.map((s) => (
                 <option key={s.code} value={s.code}>
                   {s.label}
@@ -405,10 +420,14 @@ export function OfferEditForm({
           </div>
           {rows.map((row) => {
             const targets = condTargetOptions(row.kind);
-            const hasTarget = row.kind === 'connected' || row.kind === 'metric_gte' || row.kind === 'axis_gte';
+            const hasTarget =
+              row.kind === 'connected' || row.kind === 'metric_gte' || row.kind === 'axis_gte';
             const fixedValue = row.kind === 'connected' || row.kind === 'has_card';
             return (
-              <div key={row.id} className="grid grid-cols-[1.2fr_1.4fr_0.8fr_44px] items-center gap-2">
+              <div
+                key={row.id}
+                className="grid grid-cols-[1.2fr_1.4fr_0.8fr_44px] items-center gap-2"
+              >
                 <select
                   aria-label="Condition"
                   value={row.kind}
@@ -493,7 +512,9 @@ export function OfferEditForm({
             <div className="font-head text-[15px] font-bold uppercase leading-[1.3]">
               [RATE]% back at skin marketplaces
             </div>
-            <div className="text-[13px] text-ink-2">For 14 hours in CS2 this week · [PARTNER A]</div>
+            <div className="text-[13px] text-ink-2">
+              For 14 hours in CS2 this week · [PARTNER A]
+            </div>
             <div
               className="flex h-12 items-center justify-center rounded-[14px] font-head text-xs font-bold uppercase tracking-[0.03em] text-on-orange"
               style={{ background: 'var(--grad-button)' }}

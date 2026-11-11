@@ -19,7 +19,10 @@ export interface RetentionResult {
   syncRuns: number;
 }
 
-async function sweep(selectBatch: () => Promise<{ id: string }[]>, del: (ids: string[]) => Promise<unknown>): Promise<number> {
+async function sweep(
+  selectBatch: () => Promise<{ id: string }[]>,
+  del: (ids: string[]) => Promise<unknown>,
+): Promise<number> {
   let total = 0;
   for (;;) {
     const rows = await selectBatch();

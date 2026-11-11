@@ -82,7 +82,8 @@ function s256(input: string): string {
 }
 
 function toTokens(res: TokenResponse): Tokens {
-  if (!res.access_token) throw new AdapterError('unexpected_response', 'MAL returned no access token');
+  if (!res.access_token)
+    throw new AdapterError('unexpected_response', 'MAL returned no access token');
   return {
     access: res.access_token,
     refresh: res.refresh_token,
@@ -164,7 +165,10 @@ export function createMyAnimeListAdapter(cfg: MyAnimeListAdapterConfig): Provide
 
     async refresh(tokens: Tokens): Promise<Tokens> {
       if (!tokens.refresh) throw new AdapterError('auth_expired', 'No refresh token');
-      const refreshed = await exchange({ grant_type: 'refresh_token', refresh_token: tokens.refresh });
+      const refreshed = await exchange({
+        grant_type: 'refresh_token',
+        refresh_token: tokens.refresh,
+      });
       // MAL rotates refresh tokens; keep the previous one if the response omits a new one.
       return { ...refreshed, refresh: refreshed.refresh ?? tokens.refresh };
     },

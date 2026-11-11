@@ -58,7 +58,10 @@ async function rpc<T>(url: string, method: string, params: unknown): Promise<T> 
     body: JSON.stringify({ jsonrpc: '2.0', id: method, method, params }),
   });
   if (res.error) {
-    throw new AdapterError('unexpected_response', res.error.message ?? `Helius RPC error for ${method}`);
+    throw new AdapterError(
+      'unexpected_response',
+      res.error.message ?? `Helius RPC error for ${method}`,
+    );
   }
   if (res.result === undefined) {
     throw new AdapterError('unexpected_response', `Helius RPC returned no result for ${method}`);

@@ -115,7 +115,10 @@ async function fetchMatches(
   } catch (error) {
     // No stats for this game (404) -> null; a transient upstream failure or rate limit must stop the
     // whole sync so the core can back off and retry.
-    if (error instanceof AdapterError && (error.code === 'rate_limited' || error.code === 'provider_down')) {
+    if (
+      error instanceof AdapterError &&
+      (error.code === 'rate_limited' || error.code === 'provider_down')
+    ) {
       throw error;
     }
     return null;

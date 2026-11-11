@@ -135,7 +135,11 @@ function graphqlHeaders(token: string): Record<string, string> {
  * transport errors are mapped by `httpJson` (401 -> auth_expired, 429 -> rate_limited, ...) and
  * query-level `errors` are mapped here.
  */
-async function githubGraphql<T>(token: string, query: string, variables: Record<string, unknown>): Promise<T> {
+async function githubGraphql<T>(
+  token: string,
+  query: string,
+  variables: Record<string, unknown>,
+): Promise<T> {
   const res = await httpJson<GraphQLResponse<T>>(GRAPHQL_URL, {
     method: 'POST',
     headers: graphqlHeaders(token),
@@ -162,7 +166,8 @@ export function createGitHubAdapter(cfg: GitHubAdapterConfig): ProviderAdapter {
   /** Resolve the connected account id (the stable numeric id, never a metric). */
   async function identify(tokens: Tokens): Promise<string> {
     const user = await httpJson<RestUser>(USER_URL, { headers: restHeaders(tokens.access) });
-    if (typeof user.id !== 'number') throw new AdapterError('unexpected_response', 'GitHub returned no user');
+    if (typeof user.id !== 'number')
+      throw new AdapterError('unexpected_response', 'GitHub returned no user');
     return String(user.id);
   }
 
@@ -173,7 +178,11 @@ export function createGitHubAdapter(cfg: GitHubAdapterConfig): ProviderAdapter {
     const from = new Date(now - 30 * DAY_MS).toISOString();
     const yearFrom = new Date(now - YEAR_DAYS * DAY_MS).toISOString();
 
-    const main = await githubGraphql<{ viewer?: ViewerMain }>(token, MAIN_QUERY, { from, to, yearFrom });
+    const main = await githubGraphql<{ viewer?: ViewerMain }>(token, MAIN_QUERY, {
+      from,
+      to,
+      yearFrom,
+    });
     const viewer = main.viewer;
     if (!viewer) throw new AdapterError('unexpected_response', 'GitHub returned no viewer');
 
@@ -202,8 +211,7 @@ export function createGitHubAdapter(cfg: GitHubAdapterConfig): ProviderAdapter {
     return {
       metrics: {
         'github.followers_stars': followersStars,
-        'github.contributions_30d':
-          typeof contributions30d === 'number' ? contributions30d : null,
+        'github.contributions_30d': typeof contributions30d === 'number' ? contributions30d : null,
         'github.contributions_year':
           typeof contributionsYear === 'number' ? contributionsYear : null,
       },

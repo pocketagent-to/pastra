@@ -105,7 +105,9 @@ export function isAdmin(
 ): boolean {
   if (!user) return false;
   const allow = new Set(
-    config.ADMIN_USERS.map((entry) => entry.trim().toLowerCase()).filter((entry) => entry.length > 0),
+    config.ADMIN_USERS.map((entry) => entry.trim().toLowerCase()).filter(
+      (entry) => entry.length > 0,
+    ),
   );
   if (allow.size === 0) return false;
   const candidates = [user.handle, user.email]
@@ -120,14 +122,20 @@ export async function ensureMerchant(db: Database, name: string): Promise<string
   if (trimmed.length === 0) throw new CoreError('invalid', 'merchant name is required');
   const [existing] = await db.select().from(merchants).where(eq(merchants.name, trimmed));
   if (existing) return existing.id;
-  const [created] = await db.insert(merchants).values({ name: trimmed }).returning({ id: merchants.id });
+  const [created] = await db
+    .insert(merchants)
+    .values({ name: trimmed })
+    .returning({ id: merchants.id });
   if (!created) throw new CoreError('invalid', 'could not create merchant');
   return created.id;
 }
 
 /** Every merchant (id and name), for the admin merchant picker. */
 export async function listMerchants(db: Database): Promise<Array<{ id: string; name: string }>> {
-  return db.select({ id: merchants.id, name: merchants.name }).from(merchants).orderBy(asc(merchants.name));
+  return db
+    .select({ id: merchants.id, name: merchants.name })
+    .from(merchants)
+    .orderBy(asc(merchants.name));
 }
 
 /** All offers with their merchant name, highest priority first (admin list). */
@@ -200,7 +208,10 @@ export async function createOffer(db: Database, input: OfferInput): Promise<stri
 
 /** Update an existing offer in place. Throws `not_found` when the offer does not exist. */
 export async function updateOffer(db: Database, offerId: string, input: OfferInput): Promise<void> {
-  const [existing] = await db.select({ id: offersTable.id }).from(offersTable).where(eq(offersTable.id, offerId));
+  const [existing] = await db
+    .select({ id: offersTable.id })
+    .from(offersTable)
+    .where(eq(offersTable.id, offerId));
   if (!existing) throw new CoreError('not_found', 'offer');
   const values = buildValues(input);
   const merchantId = await ensureMerchant(db, input.merchantName);

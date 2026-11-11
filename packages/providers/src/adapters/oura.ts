@@ -98,7 +98,12 @@ export function createOuraAdapter(cfg: OuraAdapterConfig): ProviderAdapter {
    * Walk an Oura collection between two days (inclusive), paging via the opaque `next_token` cursor.
    * Oura filters by the record's local `day`, so we widen the window by a day at each end to be safe.
    */
-  async function collect<T>(path: string, startMs: number, endMs: number, token: string): Promise<T[]> {
+  async function collect<T>(
+    path: string,
+    startMs: number,
+    endMs: number,
+    token: string,
+  ): Promise<T[]> {
     const headers = bearer(token);
     const startDate = dayStr(startMs - DAY_MS);
     const endDate = dayStr(endMs + DAY_MS);
@@ -127,8 +132,17 @@ export function createOuraAdapter(cfg: OuraAdapterConfig): ProviderAdapter {
   }
 
   /** Mean daily Sleep score over the window, or null if no scored day. */
-  async function sleepScore30d(startMs: number, endMs: number, token: string): Promise<number | null> {
-    const days = await collect<OuraDailySleep>('/usercollection/daily_sleep', startMs, endMs, token);
+  async function sleepScore30d(
+    startMs: number,
+    endMs: number,
+    token: string,
+  ): Promise<number | null> {
+    const days = await collect<OuraDailySleep>(
+      '/usercollection/daily_sleep',
+      startMs,
+      endMs,
+      token,
+    );
     const scores: number[] = [];
     for (const d of days) {
       const t = d.day ? Date.parse(`${d.day}T00:00:00Z`) : NaN;

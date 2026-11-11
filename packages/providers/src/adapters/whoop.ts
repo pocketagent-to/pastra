@@ -135,7 +135,12 @@ export function createWhoopAdapter(cfg: WhoopAdapterConfig): ProviderAdapter {
   const scopes = cfg.includeSleep ? [...BASE_SCOPES, SLEEP_SCOPE] : [...BASE_SCOPES];
 
   /** Walk a WHOOP collection between two instants, paging via the opaque `next_token` cursor. */
-  async function collect<T>(path: string, startMs: number, endMs: number, token: string): Promise<T[]> {
+  async function collect<T>(
+    path: string,
+    startMs: number,
+    endMs: number,
+    token: string,
+  ): Promise<T[]> {
     const headers = bearer(token);
     const out: T[] = [];
     let nextToken: string | undefined;
@@ -165,7 +170,11 @@ export function createWhoopAdapter(cfg: WhoopAdapterConfig): ProviderAdapter {
   }
 
   /** Mean aggregate sleep-performance percentage over the window (naps excluded), or null if none. */
-  async function sleepScore30d(startMs: number, endMs: number, token: string): Promise<number | null> {
+  async function sleepScore30d(
+    startMs: number,
+    endMs: number,
+    token: string,
+  ): Promise<number | null> {
     const sleeps = await collect<WhoopSleep>('/v1/activity/sleep', startMs, endMs, token);
     const scores: number[] = [];
     for (const s of sleeps) {
@@ -268,7 +277,8 @@ export function createWhoopAdapter(cfg: WhoopAdapterConfig): ProviderAdapter {
         client_secret: clientSecret,
         scope: 'offline',
       });
-      if (!res.access_token) throw new AdapterError('unexpected_response', 'No access token returned');
+      if (!res.access_token)
+        throw new AdapterError('unexpected_response', 'No access token returned');
       return {
         access: res.access_token,
         // WHOOP may omit a new refresh token; keep the old one so the connection survives.

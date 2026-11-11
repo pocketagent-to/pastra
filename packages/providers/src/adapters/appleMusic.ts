@@ -133,7 +133,8 @@ export function createAppleMusicAdapter(cfg: AppleMusicConfig): ProviderAdapter 
     async fetch(ctx: FetchContext): Promise<FetchResult> {
       if (!configured) throw new AdapterError('provider_down', 'apple_music is not configured');
       const userToken = ctx.tokens?.access;
-      if (!userToken) throw new AdapterError('auth_expired', 'No Music User Token for this connection');
+      if (!userToken)
+        throw new AdapterError('auth_expired', 'No Music User Token for this connection');
 
       const headers = bearer(developerToken, { 'music-user-token': userToken });
 

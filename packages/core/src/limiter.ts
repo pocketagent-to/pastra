@@ -26,7 +26,8 @@ export interface LimiterOptions {
   now?: () => number;
 }
 
-const defaultSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const defaultSleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Build a limiter that reads each provider's limits from `limitFor`. */
 export function createProviderLimiter(

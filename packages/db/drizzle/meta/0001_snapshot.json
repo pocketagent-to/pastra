@@ -696,12 +696,8 @@
           "name": "metric_extras_connection_id_connections_id_fk",
           "tableFrom": "metric_extras",
           "tableTo": "connections",
-          "columnsFrom": [
-            "connection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["connection_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -709,11 +705,7 @@
       "compositePrimaryKeys": {
         "metric_extras_connection_id_key_week_pk": {
           "name": "metric_extras_connection_id_key_week_pk",
-          "columns": [
-            "connection_id",
-            "key",
-            "week"
-          ]
+          "columns": ["connection_id", "key", "week"]
         }
       },
       "uniqueConstraints": {},
@@ -785,12 +777,8 @@
           "name": "metric_values_connection_id_connections_id_fk",
           "tableFrom": "metric_values",
           "tableTo": "connections",
-          "columnsFrom": [
-            "connection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["connection_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -798,11 +786,7 @@
       "compositePrimaryKeys": {
         "metric_values_connection_id_metric_key_week_pk": {
           "name": "metric_values_connection_id_metric_key_week_pk",
-          "columns": [
-            "connection_id",
-            "metric_key",
-            "week"
-          ]
+          "columns": ["connection_id", "metric_key", "week"]
         }
       },
       "uniqueConstraints": {},
@@ -893,12 +877,8 @@
           "name": "sync_runs_connection_id_connections_id_fk",
           "tableFrom": "sync_runs",
           "tableTo": "connections",
-          "columnsFrom": [
-            "connection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["connection_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -967,10 +947,7 @@
       "compositePrimaryKeys": {
         "friendships_user_a_user_b_pk": {
           "name": "friendships_user_a_user_b_pk",
-          "columns": [
-            "user_a",
-            "user_b"
-          ]
+          "columns": ["user_a", "user_b"]
         }
       },
       "uniqueConstraints": {},
@@ -1143,11 +1120,7 @@
       "compositePrimaryKeys": {
         "pass_snapshots_user_id_week_state_pk": {
           "name": "pass_snapshots_user_id_week_state_pk",
-          "columns": [
-            "user_id",
-            "week",
-            "state"
-          ]
+          "columns": ["user_id", "week", "state"]
         }
       },
       "uniqueConstraints": {},
@@ -1333,10 +1306,7 @@
       "compositePrimaryKeys": {
         "visibility_user_id_axis_pk": {
           "name": "visibility_user_id_axis_pk",
-          "columns": [
-            "user_id",
-            "axis"
-          ]
+          "columns": ["user_id", "axis"]
         }
       },
       "uniqueConstraints": {},

@@ -119,7 +119,9 @@ interface Sc2LadderSummary {
 function isCritical(error: unknown): error is AdapterError {
   return (
     isAdapterError(error) &&
-    (error.code === 'rate_limited' || error.code === 'provider_down' || error.code === 'auth_expired')
+    (error.code === 'rate_limited' ||
+      error.code === 'provider_down' ||
+      error.code === 'auth_expired')
   );
 }
 
@@ -132,7 +134,8 @@ function apiGet<T>(url: string, token: string): Promise<T> {
 async function identify(tokens: Tokens): Promise<string> {
   const info = await httpJson<UserInfo>(OAUTH_USERINFO_URL, { headers: bearer(tokens.access) });
   const id = info.sub ?? (typeof info.id === 'number' ? String(info.id) : undefined);
-  if (!id) throw new AdapterError('unexpected_response', 'Battle.net userinfo returned no account id');
+  if (!id)
+    throw new AdapterError('unexpected_response', 'Battle.net userinfo returned no account id');
   return id;
 }
 
@@ -163,7 +166,11 @@ async function fetchCharacterPoints(
  * Total WoW achievement points for the account (max over the top characters), or null when the
  * account has no readable WoW characters.
  */
-async function fetchWowPoints(host: string, namespace: string, token: string): Promise<number | null> {
+async function fetchWowPoints(
+  host: string,
+  namespace: string,
+  token: string,
+): Promise<number | null> {
   try {
     const query = new URLSearchParams({ namespace, locale: LOCALE }).toString();
     const summary = await apiGet<WowAccountSummary>(`${host}/profile/user/wow?${query}`, token);
@@ -206,7 +213,11 @@ function leagueRank(entry: Sc2ShowcaseEntry): number | null {
 }
 
 /** Best league rank across one SC2 profile's showcase entries, or null. */
-async function fetchProfileLeague(host: string, profile: Sc2PlayerProfile, token: string): Promise<number | null> {
+async function fetchProfileLeague(
+  host: string,
+  profile: Sc2PlayerProfile,
+  token: string,
+): Promise<number | null> {
   const { regionId, realmId, profileId } = profile;
   if (regionId == null || realmId == null || profileId == null) return null;
   const url = `${host}/sc2/profile/${regionId}/${realmId}/${encodeURIComponent(
@@ -227,7 +238,11 @@ async function fetchProfileLeague(host: string, profile: Sc2PlayerProfile, token
 }
 
 /** Best StarCraft II league across the account's profiles, or null when there are none. */
-async function fetchSc2League(host: string, token: string, accountId: string): Promise<number | null> {
+async function fetchSc2League(
+  host: string,
+  token: string,
+  accountId: string,
+): Promise<number | null> {
   try {
     const profiles = await apiGet<Sc2PlayerProfile[]>(
       `${host}/sc2/player/${encodeURIComponent(accountId)}`,

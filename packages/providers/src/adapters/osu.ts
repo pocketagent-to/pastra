@@ -81,7 +81,8 @@ export function createOsuAdapter(cfg: OsuAdapterConfig): ProviderAdapter {
 
   async function identify(tokens: Tokens): Promise<string> {
     const me = await readMe(tokens.access);
-    if (typeof me.id !== 'number') throw new AdapterError('unexpected_response', 'osu! returned no account');
+    if (typeof me.id !== 'number')
+      throw new AdapterError('unexpected_response', 'osu! returned no account');
     return String(me.id);
   }
 

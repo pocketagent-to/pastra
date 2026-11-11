@@ -237,7 +237,12 @@ export async function createConnectionChallenge(
   await db.insert(loginChallenges).values({
     kind: 'oauth_state',
     valueHash: sha256(state),
-    payload: { userId: params.userId, provider: params.provider, nonce, codeVerifier: pkce?.verifier },
+    payload: {
+      userId: params.userId,
+      provider: params.provider,
+      nonce,
+      codeVerifier: pkce?.verifier,
+    },
     expiresAt: new Date(Date.now() + CHALLENGE_TTL_MS),
   });
   return { state, nonce, codeVerifier: pkce?.verifier, codeChallenge: pkce?.challenge };

@@ -29,7 +29,8 @@ function toInput(body: Record<string, unknown>): OfferInput {
 async function handle(request: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
   if (!user) return Response.json({ error: { code: 'forbidden' } }, { status: 401 });
-  if (!isAdmin(getConfig(), user)) return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
+  if (!isAdmin(getConfig(), user))
+    return Response.json({ error: { code: 'forbidden' } }, { status: 403 });
 
   const { id } = await ctx.params;
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;

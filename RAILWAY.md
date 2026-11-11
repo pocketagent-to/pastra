@@ -2,11 +2,11 @@
 
 Railway hosts the whole app in one project as **three services**:
 
-| Service    | What it is                          | Config file           |
-| ---------- | ----------------------------------- | --------------------- |
-| `Postgres` | Railway managed PostgreSQL          | — (Railway plugin)    |
-| `web`      | Next.js app (long-lived container)  | `railway.web.json`    |
-| `worker`   | pg-boss background worker (the drop)| `railway.worker.json` |
+| Service    | What it is                           | Config file           |
+| ---------- | ------------------------------------ | --------------------- |
+| `Postgres` | Railway managed PostgreSQL           | — (Railway plugin)    |
+| `web`      | Next.js app (long-lived container)   | `railway.web.json`    |
+| `worker`   | pg-boss background worker (the drop) | `railway.worker.json` |
 
 Why Railway fits well: unlike Vercel, it runs a **persistent container**, so the `worker` finally
 has a home, and `web` uses a real connection pool against a **direct** Postgres (no pgbouncer). The
@@ -73,31 +73,31 @@ service's actual name if different.
 
 ### `web`
 
-| Variable           | Value                                   | Notes                                   |
-| ------------------ | --------------------------------------- | --------------------------------------- |
-| `DATABASE_URL`     | `${{Postgres.DATABASE_URL}}`            | the managed Postgres (direct)           |
-| `WEB_DB_POOL`      | `persistent`                            | long-lived container → real pool        |
-| `APP_URL`          | `https://${{RAILWAY_PUBLIC_DOMAIN}}`    | the service's public URL                |
-| `NODE_ENV`         | `production`                            |                                         |
-| `SESSION_SECRET`   | `openssl rand -hex 32`                  | generate (below)                        |
-| `TOKEN_ENC_KEYS`   | `v1:<hex>`                              | generate (below)                        |
-| `HMAC_KEY`         | `openssl rand -hex 32`                  | generate                                |
-| `PRIVY_APP_ID`     | from dashboard.privy.io                 | login                                   |
-| `PRIVY_APP_SECRET` | from dashboard.privy.io                 | login                                   |
+| Variable           | Value                                | Notes                            |
+| ------------------ | ------------------------------------ | -------------------------------- |
+| `DATABASE_URL`     | `${{Postgres.DATABASE_URL}}`         | the managed Postgres (direct)    |
+| `WEB_DB_POOL`      | `persistent`                         | long-lived container → real pool |
+| `APP_URL`          | `https://${{RAILWAY_PUBLIC_DOMAIN}}` | the service's public URL         |
+| `NODE_ENV`         | `production`                         |                                  |
+| `SESSION_SECRET`   | `openssl rand -hex 32`               | generate (below)                 |
+| `TOKEN_ENC_KEYS`   | `v1:<hex>`                           | generate (below)                 |
+| `HMAC_KEY`         | `openssl rand -hex 32`               | generate                         |
+| `PRIVY_APP_ID`     | from dashboard.privy.io              | login                            |
+| `PRIVY_APP_SECRET` | from dashboard.privy.io              | login                            |
 
 Add any provider credentials you want live (see `INTEGRATIONS.md`). `DATABASE_URL_UNPOOLED` is **not
 needed** on Railway (single direct Postgres); it falls back to `DATABASE_URL`.
 
 ### `worker`
 
-| Variable         | Value                        | Notes                                              |
-| ---------------- | ---------------------------- | -------------------------------------------------- |
-| `DATABASE_URL`   | `${{Postgres.DATABASE_URL}}` | same Postgres                                       |
-| `NODE_ENV`       | `production`                 |                                                    |
-| `TOKEN_ENC_KEYS` | same as web                  | the worker decrypts tokens to sync                 |
-| `HMAC_KEY`       | same as web                  |                                                    |
-| `DROP_CRON`      | `0 13 * * 1` (default)       | weekly drop time; optional                         |
-| `DROP_TZ`        | `Europe/Warsaw` (default)    | optional                                           |
+| Variable         | Value                        | Notes                              |
+| ---------------- | ---------------------------- | ---------------------------------- |
+| `DATABASE_URL`   | `${{Postgres.DATABASE_URL}}` | same Postgres                      |
+| `NODE_ENV`       | `production`                 |                                    |
+| `TOKEN_ENC_KEYS` | same as web                  | the worker decrypts tokens to sync |
+| `HMAC_KEY`       | same as web                  |                                    |
+| `DROP_CRON`      | `0 13 * * 1` (default)       | weekly drop time; optional         |
+| `DROP_TZ`        | `Europe/Warsaw` (default)    | optional                           |
 
 > The worker runs the weekly drop, which calls each provider's API to sync connections, so it needs
 > the **same provider credentials** as `web` (the OAuth client ids/secrets and API keys from

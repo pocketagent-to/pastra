@@ -148,7 +148,9 @@ export function EditProfileForm({ initial }: { initial: EditProfileInitial }) {
         <div className="text-xs leading-relaxed text-ink-3">
           [your-domain]/{handle} · can be changed once every 30 days
         </div>
-        {handleError && <div className="text-[13px] font-semibold text-[#FF8A7A]">{handleError}</div>}
+        {handleError && (
+          <div className="text-[13px] font-semibold text-[#FF8A7A]">{handleError}</div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">

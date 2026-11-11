@@ -123,14 +123,19 @@ async function verifyOpenIdAssertion(params: Record<string, string>): Promise<bo
       signal: controller.signal,
     });
     if (!res.ok) {
-      if (res.status === 429) throw new AdapterError('rate_limited', 'OpenID verification rate limited');
-      if (res.status >= 500) throw new AdapterError('provider_down', `OpenID endpoint ${res.status}`);
+      if (res.status === 429)
+        throw new AdapterError('rate_limited', 'OpenID verification rate limited');
+      if (res.status >= 500)
+        throw new AdapterError('provider_down', `OpenID endpoint ${res.status}`);
       throw new AdapterError('unexpected_response', `OpenID endpoint ${res.status}`);
     }
     body = await res.text();
   } catch (error) {
     if (error instanceof AdapterError) throw error;
-    throw new AdapterError('provider_down', `OpenID verification failed: ${(error as Error).message}`);
+    throw new AdapterError(
+      'provider_down',
+      `OpenID verification failed: ${(error as Error).message}`,
+    );
   } finally {
     clearTimeout(timer);
   }
@@ -175,7 +180,10 @@ async function fetchGameAchievementPct(
   } catch (error) {
     // A game with no stats (400) or hidden game-stats (403) is skipped; a transient upstream
     // failure or rate limit must stop the whole sync so the core can back off and retry.
-    if (error instanceof AdapterError && (error.code === 'rate_limited' || error.code === 'provider_down')) {
+    if (
+      error instanceof AdapterError &&
+      (error.code === 'rate_limited' || error.code === 'provider_down')
+    ) {
       throw error;
     }
     return null;
@@ -246,10 +254,12 @@ export function createSteamAdapter(cfg: SteamConfig): ProviderAdapter {
       }
       const claimedId = ctx.params['openid.claimed_id'] ?? ctx.params['openid.identity'];
       const steamId = claimedId ? CLAIMED_ID_RE.exec(claimedId)?.[1] : undefined;
-      if (!steamId) throw new AdapterError('unexpected_response', 'Steam identity is missing or malformed');
+      if (!steamId)
+        throw new AdapterError('unexpected_response', 'Steam identity is missing or malformed');
 
       const valid = await verifyOpenIdAssertion(ctx.params);
-      if (!valid) throw new AdapterError('unexpected_response', 'Steam OpenID assertion failed verification');
+      if (!valid)
+        throw new AdapterError('unexpected_response', 'Steam OpenID assertion failed verification');
 
       // The SteamID64 is the external id (one account = one pass); no tokens for Steam.
       return { externalId: steamId };

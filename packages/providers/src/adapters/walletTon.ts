@@ -165,7 +165,10 @@ export function createTonWalletAdapter(opts: {
         valid = false;
       }
       if (!valid) {
-        throw new AdapterError('unexpected_response', 'ton_proof signature does not match public key');
+        throw new AdapterError(
+          'unexpected_response',
+          'ton_proof signature does not match public key',
+        );
       }
       // The external id (one account = one pass) is the canonical raw address.
       return { externalId: `${parsed.workchain}:${parsed.hashHex}` };

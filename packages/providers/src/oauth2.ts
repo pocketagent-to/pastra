@@ -56,7 +56,9 @@ function toTokens(res: TokenResponse, fallbackScopes: string[]): Tokens {
 
 async function exchange(cfg: OAuth2Config, form: Record<string, string>): Promise<Tokens> {
   const useBasic = cfg.clientAuth === 'basic';
-  const body = useBasic ? form : { ...form, client_id: cfg.clientId, client_secret: cfg.clientSecret };
+  const body = useBasic
+    ? form
+    : { ...form, client_id: cfg.clientId, client_secret: cfg.clientSecret };
   const headers = useBasic ? basicAuth(cfg) : {};
   const res = await httpForm<TokenResponse>(cfg.tokenUrl, body, headers);
   if (!res.access_token) throw new AdapterError('unexpected_response', 'No access token returned');

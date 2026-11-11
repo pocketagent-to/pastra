@@ -24,10 +24,14 @@ export interface RetryOptions {
 
 const RETRYABLE = new Set(['rate_limited', 'provider_down']);
 
-const defaultSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const defaultSleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Run `fn`, retrying only transient adapter errors with capped, jittered exponential backoff. */
-export async function withAdapterRetry<T>(fn: () => Promise<T>, opts: RetryOptions = {}): Promise<T> {
+export async function withAdapterRetry<T>(
+  fn: () => Promise<T>,
+  opts: RetryOptions = {},
+): Promise<T> {
   const attempts = opts.attempts ?? 3;
   const baseMs = opts.baseMs ?? 500;
   const maxMs = opts.maxMs ?? 8000;

@@ -124,7 +124,8 @@ async function fsqGet<T>(url: string): Promise<T> {
   const data = await httpJson<Envelope<T>>(url);
   const code = data.meta?.code;
   if (typeof code === 'number' && code >= 400) throw metaError(code);
-  if (!data.response) throw new AdapterError('unexpected_response', 'Foursquare returned no response');
+  if (!data.response)
+    throw new AdapterError('unexpected_response', 'Foursquare returned no response');
   return data.response;
 }
 
@@ -138,7 +139,9 @@ async function softFetch<T>(fn: () => Promise<T>): Promise<T | null> {
   } catch (error) {
     if (
       error instanceof AdapterError &&
-      (error.code === 'auth_expired' || error.code === 'rate_limited' || error.code === 'provider_down')
+      (error.code === 'auth_expired' ||
+        error.code === 'rate_limited' ||
+        error.code === 'provider_down')
     ) {
       throw error;
     }
@@ -233,7 +236,8 @@ export function createFoursquareAdapter(cfg: FoursquareAdapterConfig): ProviderA
         code,
       }).toString()}`;
       const res = await httpJson<TokenResponse>(url);
-      if (!res.access_token) throw new AdapterError('unexpected_response', 'No access token returned');
+      if (!res.access_token)
+        throw new AdapterError('unexpected_response', 'No access token returned');
       // Long-lived token, no scopes, no refresh.
       const tokens: Tokens = { access: res.access_token, scopes: [] };
       const externalId = await identify(res.access_token);

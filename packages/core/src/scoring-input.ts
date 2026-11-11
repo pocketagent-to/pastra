@@ -33,7 +33,10 @@ export async function buildScoringInput(
   catalog: Catalog,
   params: { userId: string; week: string },
 ): Promise<ScoringInput> {
-  const map = await buildScoringInputs(db, catalog, { userIds: [params.userId], week: params.week });
+  const map = await buildScoringInputs(db, catalog, {
+    userIds: [params.userId],
+    week: params.week,
+  });
   return map.get(params.userId) ?? emptyInput(params.week);
 }
 

@@ -1,13 +1,7 @@
 import { AdapterError } from '../errors';
 import { bearer, httpJson } from '../http';
 import { createOAuth2Adapter } from '../oauth2';
-import type {
-  BeginContext,
-  BeginResult,
-  FetchResult,
-  ProviderAdapter,
-  Tokens,
-} from '../types';
+import type { BeginContext, BeginResult, FetchResult, ProviderAdapter, Tokens } from '../types';
 
 /**
  * Lichess adapter (OAuth 2.0 with PKCE, public client). The generic OAuth2 adapter handles the

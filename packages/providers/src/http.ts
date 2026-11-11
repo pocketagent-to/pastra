@@ -42,7 +42,11 @@ function statusError(res: Response, forbiddenAs: HttpOptions['forbiddenAs']): Ad
   if (res.status === 401) return new AdapterError('auth_expired', 'Unauthorized');
   if (res.status === 403) return new AdapterError(forbiddenAs ?? 'auth_expired', 'Forbidden');
   if (res.status === 429)
-    return new AdapterError('rate_limited', 'Rate limited', retryDate(res.headers.get('retry-after')));
+    return new AdapterError(
+      'rate_limited',
+      'Rate limited',
+      retryDate(res.headers.get('retry-after')),
+    );
   if (res.status >= 500) return new AdapterError('provider_down', `Upstream ${res.status}`);
   return new AdapterError('unexpected_response', `HTTP ${res.status}`);
 }
@@ -85,7 +89,11 @@ export async function httpForm<T = unknown>(
 ): Promise<T> {
   return httpJson<T>(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json', ...headers },
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      accept: 'application/json',
+      ...headers,
+    },
     body: new URLSearchParams(form),
   });
 }

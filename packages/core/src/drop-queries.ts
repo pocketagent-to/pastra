@@ -40,7 +40,11 @@ export interface UserDropRow {
 }
 
 /** One page of users (with the fields the compute/offers steps need), ordered by id. */
-export function pageUsersForDrop(db: Database, cursor: string, limit: number): Promise<UserDropRow[]> {
+export function pageUsersForDrop(
+  db: Database,
+  cursor: string,
+  limit: number,
+): Promise<UserDropRow[]> {
   return db
     .select({ id: users.id, country: users.country, offersConsent: users.offersConsent })
     .from(users)
@@ -50,7 +54,11 @@ export function pageUsersForDrop(db: Database, cursor: string, limit: number): P
 }
 
 /** One page of user ids, ordered by id (for the recap step). */
-export function pageUserIds(db: Database, cursor: string, limit: number): Promise<{ id: string }[]> {
+export function pageUserIds(
+  db: Database,
+  cursor: string,
+  limit: number,
+): Promise<{ id: string }[]> {
   return db
     .select({ id: users.id })
     .from(users)

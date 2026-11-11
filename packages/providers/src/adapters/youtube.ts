@@ -92,7 +92,10 @@ export function createYouTubeAdapter(cfg: YouTubeAdapterConfig): ProviderAdapter
    * likewise means we cannot read the count. Either way the (optional, delta_30d) metric is null —
    * we never fail the whole sync for it, but we do let auth/rate/upstream errors propagate.
    */
-  async function likedVideoCount(token: string, likesPlaylistId: string | undefined): Promise<number | null> {
+  async function likedVideoCount(
+    token: string,
+    likesPlaylistId: string | undefined,
+  ): Promise<number | null> {
     if (!likesPlaylistId) return null;
     try {
       const res = await ytGet<YtListResponse>(PLAYLIST_ITEMS_URL, token, {
@@ -103,7 +106,10 @@ export function createYouTubeAdapter(cfg: YouTubeAdapterConfig): ProviderAdapter
       return totalResults(res);
     } catch (error) {
       // A forbidden/not-found playlist means the liked videos are private — report null, not failure.
-      if (isAdapterError(error) && (error.code === 'private_data' || error.code === 'unexpected_response')) {
+      if (
+        isAdapterError(error) &&
+        (error.code === 'private_data' || error.code === 'unexpected_response')
+      ) {
         return null;
       }
       throw error;

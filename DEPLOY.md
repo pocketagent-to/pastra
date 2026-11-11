@@ -47,18 +47,18 @@ Without the origin allowlisted, Privy login is rejected in the browser.
 
 ## Environment variables (Vercel → Production)
 
-| Variable                  | Value                                                              | Notes |
-| ------------------------- | ----------------------------------------------------------------- | ----- |
-| `DATABASE_URL`            | Neon **pooled** string (`-pooler` host, `?sslmode=require`)       | required — serverless web |
-| `DATABASE_URL_UNPOOLED`   | Neon **direct** string (no `-pooler`, `?sslmode=require`)         | migrations + worker; empty locally |
-| `APP_URL`                 | `https://<project>.vercel.app`                                    | the live URL |
-| `SESSION_SECRET`          | 32-byte random hex                                                | generate fresh |
-| `HMAC_KEY`                | 32-byte random hex                                                | generate fresh |
-| `TOKEN_ENC_KEYS`          | `v1:<64 hex chars>` (32 bytes)                                    | generate fresh |
-| `PRIVY_APP_ID`            | Privy app id                                                      | server |
-| `PRIVY_APP_SECRET`        | Privy app secret                                                  | server, secret |
-| `NEXT_PUBLIC_PRIVY_APP_ID`| same as `PRIVY_APP_ID`                                            | exposed to the browser |
-| `CARD_PROVIDER`           | `mock`                                                            | Wirex is behind the same interface |
+| Variable                   | Value                                                       | Notes                              |
+| -------------------------- | ----------------------------------------------------------- | ---------------------------------- |
+| `DATABASE_URL`             | Neon **pooled** string (`-pooler` host, `?sslmode=require`) | required — serverless web          |
+| `DATABASE_URL_UNPOOLED`    | Neon **direct** string (no `-pooler`, `?sslmode=require`)   | migrations + worker; empty locally |
+| `APP_URL`                  | `https://<project>.vercel.app`                              | the live URL                       |
+| `SESSION_SECRET`           | 32-byte random hex                                          | generate fresh                     |
+| `HMAC_KEY`                 | 32-byte random hex                                          | generate fresh                     |
+| `TOKEN_ENC_KEYS`           | `v1:<64 hex chars>` (32 bytes)                              | generate fresh                     |
+| `PRIVY_APP_ID`             | Privy app id                                                | server                             |
+| `PRIVY_APP_SECRET`         | Privy app secret                                            | server, secret                     |
+| `NEXT_PUBLIC_PRIVY_APP_ID` | same as `PRIVY_APP_ID`                                      | exposed to the browser             |
+| `CARD_PROVIDER`            | `mock`                                                      | Wirex is behind the same interface |
 
 Generate the three secrets with:
 

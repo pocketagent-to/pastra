@@ -113,8 +113,12 @@ async function anilistGraphql<T>(token: string, query: string): Promise<T> {
   if (res.errors?.length) {
     const status = res.errors.find((e) => typeof e.status === 'number')?.status;
     if (status === 429) throw new AdapterError('rate_limited', 'AniList rate limited');
-    if (status === 401 || status === 403) throw new AdapterError('auth_expired', 'AniList rejected the token');
-    throw new AdapterError('unexpected_response', res.errors[0]?.message ?? 'AniList GraphQL error');
+    if (status === 401 || status === 403)
+      throw new AdapterError('auth_expired', 'AniList rejected the token');
+    throw new AdapterError(
+      'unexpected_response',
+      res.errors[0]?.message ?? 'AniList GraphQL error',
+    );
   }
   if (!res.data) throw new AdapterError('unexpected_response', 'AniList GraphQL returned no data');
   return res.data;
@@ -139,14 +143,21 @@ export function createAniListAdapter(cfg: AniListAdapterConfig): ProviderAdapter
   const { clientId, clientSecret } = cfg;
 
   async function identify(tokens: Tokens): Promise<string> {
-    const data = await anilistGraphql<{ Viewer?: ViewerNode | null }>(tokens.access, VIEWER_ID_QUERY);
+    const data = await anilistGraphql<{ Viewer?: ViewerNode | null }>(
+      tokens.access,
+      VIEWER_ID_QUERY,
+    );
     const id = data.Viewer?.id;
-    if (typeof id !== 'number') throw new AdapterError('unexpected_response', 'AniList returned no viewer');
+    if (typeof id !== 'number')
+      throw new AdapterError('unexpected_response', 'AniList returned no viewer');
     return String(id);
   }
 
   async function fetchMetrics(args: { tokens: Tokens }): Promise<FetchResult> {
-    const data = await anilistGraphql<{ Viewer?: ViewerNode | null }>(args.tokens.access, STATS_QUERY);
+    const data = await anilistGraphql<{ Viewer?: ViewerNode | null }>(
+      args.tokens.access,
+      STATS_QUERY,
+    );
     const viewer = data.Viewer;
     if (!viewer) throw new AdapterError('unexpected_response', 'AniList returned no viewer');
 
