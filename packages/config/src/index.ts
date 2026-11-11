@@ -44,6 +44,10 @@ export const configSchema = z.object({
   // The DIRECT endpoint — used by migrations, the worker and seed (pg-boss LISTEN/NOTIFY, DDL,
   // prepared statements). Empty in local dev, where it falls back to DATABASE_URL (one Postgres).
   DATABASE_URL_UNPOOLED: z.string().default(''),
+  // How the WEB process pools DB connections. `serverless` (default) suits Vercel's per-request
+  // functions on the pgbouncer pooler (max:1, prepare:false). `persistent` suits a long-lived
+  // container (Railway/Fly/Render/VPS) on a direct Postgres: a real pool, prepared statements on.
+  WEB_DB_POOL: z.enum(['serverless', 'persistent']).default('serverless'),
   SESSION_SECRET: z.string().min(1).default('dev-session-secret-change-me'),
   TOKEN_ENC_KEYS: z.string().min(1).default('v1:00000000000000000000000000000000000000000000'),
   HMAC_KEY: z.string().min(1).default('dev-hmac-key-change-me'),

@@ -121,8 +121,11 @@ export function liveProviders(): Set<ProviderId> {
 }
 
 export function getDb(): Database {
-  // Serverless: the Neon pooler endpoint, one multiplexed connection per warm instance.
-  dbSingleton ??= createDb(getConfig().DATABASE_URL, 'serverless');
+  // Pool shape depends on how web is hosted: `serverless` (Vercel, pgbouncer pooler) keeps one
+  // multiplexed connection per warm instance; `persistent` (long-lived container on direct Postgres)
+  // keeps a real pool. Set WEB_DB_POOL=persistent on Railway/Fly/Render/VPS.
+  const config = getConfig();
+  dbSingleton ??= createDb(config.DATABASE_URL, config.WEB_DB_POOL);
   return dbSingleton;
 }
 

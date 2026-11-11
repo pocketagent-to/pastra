@@ -19,9 +19,7 @@
     "@pastra/notify": "workspace:*",
     "@pastra/providers": "workspace:*",
     "@pastra/scoring": "workspace:*",
-    "pg-boss": "12.38.1"
-  },
-  "devDependencies": {
+    "pg-boss": "12.38.1",
     "tsx": "4.23.15"
   }
 }
