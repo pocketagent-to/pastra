@@ -74,7 +74,7 @@ const TABS = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="app-shell pwa-safe-bottom shrink-0 border-t border-divider bg-[#0a0a0c]">
+    <nav className="app-shell shrink-0 border-t border-divider bg-[#16171B]">
       <ul className="grid grid-cols-5">
         {TABS.map(({ href, label, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);

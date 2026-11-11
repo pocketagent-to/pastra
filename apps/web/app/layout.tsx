@@ -8,7 +8,9 @@ export const metadata: Metadata = {
   title: 'Hextra',
   description: 'Your pass: six sides of your life in one hexagon, plus a crypto card.',
   applicationName: 'HEXTRA',
-  appleWebApp: { capable: true, title: 'HEXTRA', statusBarStyle: 'black-translucent' },
+  // Reserved (non-overlay) status bar: iOS insets the web view below the status bar and above the
+  // home indicator itself, so we don't manage safe areas by hand and there's no strip below the nav.
+  appleWebApp: { capable: true, title: 'HEXTRA', statusBarStyle: 'black' },
   icons: {
     icon: '/icons/icon-192.png',
     apple: '/icons/apple-touch-icon.png',
@@ -18,8 +20,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  viewportFit: 'cover',
-  themeColor: '#05081f',
+  // theme-color fills the iOS-reserved status-bar / home-indicator areas; match the header/nav chrome.
+  themeColor: '#16171B',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

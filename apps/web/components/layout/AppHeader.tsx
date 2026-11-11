@@ -4,7 +4,7 @@ import { Logo } from '@/components/brand/Logo';
 /** Top header: logo + wordmark left, profile icon (to Settings) right (design/Main.html). */
 export function AppHeader() {
   return (
-    <header className="app-shell pwa-safe-top flex shrink-0 items-center justify-between bg-[#16171B] px-5 pb-3.5">
+    <header className="app-shell flex shrink-0 items-center justify-between bg-[#16171B] px-5 py-3.5">
       <Link href="/pass" aria-label="Hextra home" className="flex items-center gap-2.5">
         <Logo size={34} />
         <span className="font-head text-lg font-extrabold tracking-[0.04em]">HEXTRA</span>
