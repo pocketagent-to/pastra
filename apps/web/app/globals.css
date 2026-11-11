@@ -84,6 +84,16 @@ body {
   width: 100%;
 }
 
+/* iOS/Android PWA safe areas (standalone with viewport-fit: cover): keep the header below the
+ * status bar / notch and the bottom nav above the home indicator. In a browser the insets are 0. */
+@utility pwa-safe-top {
+  padding-top: calc(0.875rem + env(safe-area-inset-top));
+}
+
+@utility pwa-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Skeleton shimmer for route loading states (a gradient that sweeps side to side). */
 @keyframes pastra-shimmer {
   100% {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 /** A nested-screen header: a square back button and an uppercase title (design/Category.html). */
 export function BackHeader({ title, back = '/pass' }: { title: string; back?: string }) {
   return (
-    <header className="app-shell flex items-center gap-3.5 bg-[#16171B] px-5 py-3.5">
+    <header className="app-shell pwa-safe-top flex items-center gap-3.5 bg-[#16171B] px-5 pb-3.5">
       <Link
         href={back}
         aria-label="Back"
