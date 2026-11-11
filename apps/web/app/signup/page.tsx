@@ -1,20 +1,32 @@
 import { getConfig } from '@pastra/config';
+import { catalog, type ProviderId } from '@pastra/catalog';
 import { Logo } from '@/components/brand/Logo';
 import { OutlineButton } from '@/components/ui/Button';
 import { PrivyLogin } from '@/components/auth/PrivyLogin';
+import { Hexagon } from '@/components/ui/Hexagon';
+import { ServiceLogo } from '@/components/ui/ServiceLogo';
 
 export const dynamic = 'force-dynamic';
 
+/** A few recognisable services, as a taste of what builds your hexagon. */
+const POPULAR: Array<{ id: ProviderId; name: string }> = [
+  { id: 'steam', name: 'Steam' },
+  { id: 'discord', name: 'Discord' },
+  { id: 'github', name: 'GitHub' },
+  { id: 'x', name: 'X' },
+  { id: 'tidal', name: 'TIDAL' },
+  { id: 'wallet_evm', name: 'EVM wallet' },
+];
+
 /**
  * Sign up (A1). Real sign-in is Privy (email + Google) which also provisions the embedded wallet
- * (docs/architecture.md section 11.1). The server side (/api/auth/privy) is wired; the client
- * provider is activated once Privy keys are added (see README "Enabling Privy"). In development a
- * gated dev-login shortcut is used for end-to-end testing.
+ * (docs/architecture.md section 11.1). In development a gated dev-login shortcut is used for e2e.
  */
 export default function SignUp() {
   const config = getConfig();
   const privyConfigured = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
   const devLogin = config.DEV_LOGIN_ENABLED && config.NODE_ENV === 'development';
+  const moreCount = Math.max(0, catalog.providers.length - POPULAR.length);
 
   return (
     <main className="app-shell flex min-h-dvh flex-col">
@@ -52,7 +64,36 @@ export default function SignUp() {
           )}
         </div>
 
-        <p className="mt-auto text-center text-xs leading-relaxed text-ink-3">
+        {/* Taste of the result: connect services → your hexagon + level. */}
+        <div className="flex flex-1 flex-col items-center justify-center gap-5 py-2">
+          <Hexagon
+            values={{ sports: 34, gaming: 84, crypto: 58, music: 46, social: 66, lifestyle: 52 }}
+            size={190}
+            showLabels={false}
+            showValues={false}
+          />
+          <p className="max-w-[300px] text-center text-[14px] leading-relaxed text-ink-2">
+            Connect the services you already use — HEXTRA turns them into your hexagon and your
+            level.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {POPULAR.map((p) => (
+              <span
+                key={p.id}
+                className="flex h-11 w-11 items-center justify-center rounded-tile border border-divider bg-panel"
+              >
+                <ServiceLogo provider={p.id} name={p.name} size={26} />
+              </span>
+            ))}
+            {moreCount > 0 && (
+              <span className="flex h-11 items-center rounded-tile border border-divider bg-panel px-3.5 text-[13px] font-semibold text-ink-3">
+                +{moreCount}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <p className="text-center text-xs leading-relaxed text-ink-3">
           By continuing you agree to the{' '}
           <a href="/terms" className="text-ink-2">
             Terms
