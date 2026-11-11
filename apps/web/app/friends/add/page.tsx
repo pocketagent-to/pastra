@@ -1,44 +1,26 @@
+import { ensureFriendCode } from '@pastra/core';
 import { AppShell } from '@/components/layout/AppShell';
 import { PromoCode } from '@/components/ui/PromoCode';
+import { requireUser } from '@/lib/data';
+import { getDb } from '@/lib/server';
+import { AddFriendForm } from './AddFriendForm';
 
 /** E3 · Add a friend by code (docs/product-spec.md section 12). */
-export default function AddFriend() {
+export default async function AddFriend() {
+  const user = await requireUser();
+  const code = await ensureFriendCode(getDb(), user.id);
   return (
     <AppShell back="/friends" title="Add a friend">
       <div className="flex min-h-full flex-col gap-[22px] pt-2">
         <section className="flex flex-col gap-3 rounded-panel border border-[#3A2C8F] p-[18px]">
           <h2 className="font-head text-[13px] font-bold tracking-[0.05em]">Your code</h2>
-          <PromoCode code="K7M3QX" variant="tiles" />
+          <PromoCode code={code} variant="tiles" />
           <p className="text-[13px] leading-[1.45] text-ink-2">
             Anyone with this code can add you.
           </p>
         </section>
 
-        <section className="flex flex-col gap-2.5">
-          <label
-            htmlFor="friend-code"
-            className="font-head text-[13px] font-bold tracking-[0.05em]"
-          >
-            Enter a friend&apos;s code
-          </label>
-          <div className="flex gap-2">
-            <input
-              id="friend-code"
-              placeholder="ABCDEF"
-              maxLength={6}
-              autoCapitalize="characters"
-              autoComplete="off"
-              className="h-[54px] min-w-0 flex-1 rounded-button border-[1.5px] border-[#4A4E5A] bg-panel px-4 font-head text-xl font-bold uppercase tracking-[0.3em]"
-            />
-            <button
-              type="button"
-              className="h-[54px] rounded-button border-[1.5px] border-white px-5 font-semibold"
-            >
-              Find
-            </button>
-          </div>
-          <p className="text-[13px] leading-[1.5] text-ink-3">6 characters, letters and numbers.</p>
-        </section>
+        <AddFriendForm />
 
         <p className="text-[13px] leading-[1.5] text-ink-3">
           Adding is instant for both of you. You both see the sides each of you shares with friends.

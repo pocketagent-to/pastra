@@ -1,21 +1,22 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { catalog } from '@pastra/catalog';
+import { currentWeek, getFriendProfile } from '@pastra/core';
 import { AppShell } from '@/components/layout/AppShell';
 import { Hexagon } from '@/components/ui/Hexagon';
 import { GradientText } from '@/components/ui/GradientText';
 import { PrimaryButton } from '@/components/ui/Button';
-
-const FRIEND = {
-  gaming: 70,
-  crypto: 55,
-  music: 80,
-  social: 44,
-  lifestyle: 30,
-} as const;
+import { requireUser } from '@/lib/data';
+import { getDb } from '@/lib/server';
 
 /** E4 · Friend profile (docs/product-spec.md section 12). */
 export default async function FriendProfile({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const initial = handle.charAt(0).toUpperCase();
+  const user = await requireUser();
+  const profile = await getFriendProfile(getDb(), catalog, user.id, handle, currentWeek());
+  if (!profile) notFound();
+
+  const initial = profile.handle.charAt(0).toUpperCase();
   return (
     <AppShell back="/friends" title="Friend">
       <div className="flex min-h-full flex-col gap-[22px] pt-2">
@@ -29,17 +30,17 @@ export default async function FriendProfile({ params }: { params: Promise<{ hand
           </div>
           <div className="flex flex-grow flex-col gap-1.5">
             <GradientText className="text-2xl font-extrabold uppercase leading-[1.1]">
-              {handle}
+              {profile.handle}
             </GradientText>
-            <div className="text-[13px] text-ink-3">[your-domain]/{handle}</div>
+            <div className="text-[13px] text-ink-3">[your-domain]/{profile.handle}</div>
           </div>
           <span className="whitespace-nowrap rounded-[10px] bg-orange px-3 py-1.5 font-head text-[13px] font-bold text-on-orange">
-            LVL 22
+            LVL {profile.level}
           </span>
         </div>
 
         <div className="font-head text-sm font-medium uppercase tracking-[0.03em] text-orange-light">
-          Music fan
+          {profile.title}
         </div>
 
         <div
@@ -47,17 +48,18 @@ export default async function FriendProfile({ params }: { params: Promise<{ hand
           style={{ background: 'radial-gradient(85% 60% at 50% 40%, #22359E 0%, #16171B 78%)' }}
         >
           <div className="flex justify-center">
-            <Hexagon values={FRIEND} size={300} />
+            <Hexagon values={profile.axes} size={300} />
           </div>
         </div>
 
         <p className="text-[13px] leading-[1.5] text-ink-3">
-          You see the sides <span className="capitalize">{handle}</span> shares with friends.
+          You see the sides <span className="capitalize">{profile.handle}</span> shares with
+          friends.
         </p>
 
         <div className="mt-auto flex flex-col gap-2.5">
-          <PrimaryButton href={`/friends/${handle}/compare`} className="h-14 text-sm">
-            Compare with {handle}
+          <PrimaryButton href={`/friends/${profile.handle}/compare`} className="h-14 text-sm">
+            Compare with {profile.handle}
           </PrimaryButton>
           <Link
             href="/friends"

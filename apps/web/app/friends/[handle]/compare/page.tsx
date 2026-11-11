@@ -1,24 +1,24 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { catalog } from '@pastra/catalog';
+import { compareFriends, currentWeek } from '@pastra/core';
 import { AppShell } from '@/components/layout/AppShell';
 import { Hexagon } from '@/components/ui/Hexagon';
 import { cn } from '@/lib/cn';
 import { AXIS_SHORT } from '@/lib/axes';
 import { HEX_AXIS_ORDER } from '@/lib/hexagon';
-import { axesValues, EXAMPLE_HANDLE, EXAMPLE_PASS } from '@/lib/example';
-
-const FRIEND: Record<string, number> = {
-  gaming: 70,
-  crypto: 55,
-  music: 80,
-  social: 44,
-  lifestyle: 30,
-  sports: 0,
-};
+import { requireUser } from '@/lib/data';
+import { getDb } from '@/lib/server';
 
 /** E5 · Compare two passes (docs/product-spec.md section 12). */
 export default async function Compare({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const mine = axesValues();
+  const user = await requireUser();
+  const view = await compareFriends(getDb(), catalog, user.id, handle, currentWeek());
+  if (!view) notFound();
+
+  const mine = view.me.axes;
+  const friend = view.friend.axes;
   return (
     <AppShell tab>
       <div className="flex flex-col gap-5 pt-1">
@@ -45,27 +45,29 @@ export default async function Compare({ params }: { params: Promise<{ handle: st
         <div className="flex items-center justify-between gap-2.5">
           <div className="flex flex-col gap-1">
             <div className="font-head text-xl font-extrabold uppercase text-[#7C9BFF]">
-              {EXAMPLE_HANDLE}
+              {view.me.handle}
             </div>
-            <div className="text-xs text-ink-2">LVL {EXAMPLE_PASS.level} · solid line</div>
+            <div className="text-xs text-ink-2">LVL {view.me.level} · solid line</div>
           </div>
           <div className="font-head text-sm font-bold text-ink-3">VS</div>
           <div className="flex flex-col items-end gap-1">
-            <div className="font-head text-xl font-extrabold uppercase text-orange">{handle}</div>
+            <div className="font-head text-xl font-extrabold uppercase text-orange">
+              {view.friend.handle}
+            </div>
             <div className="text-xs text-ink-2">dashed line</div>
           </div>
         </div>
 
         <div className="rounded-panel bg-panel p-4">
           <div className="flex justify-center">
-            <Hexagon values={mine} compare={FRIEND} size={300} />
+            <Hexagon values={mine} compare={friend} size={300} />
           </div>
         </div>
 
         <div className="divide-y divide-divider rounded-panel bg-panel px-4">
           {HEX_AXIS_ORDER.map((axis) => {
             const myVal = mine[axis];
-            const friendVal = FRIEND[axis] ?? 0;
+            const friendVal = friend[axis] ?? 0;
             const meLeads = myVal >= friendVal;
             return (
               <div key={axis} className="flex h-[46px] items-center">
