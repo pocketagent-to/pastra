@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PrimaryButton } from '@/components/ui/Button';
+import { isTelegram } from '@/lib/telegram';
 
 type Platform = 'ios' | 'android' | 'desktop';
 
@@ -44,10 +45,12 @@ export function InstallBanner() {
   const [dismissed, setDismissed] = useState(true);
   const [open, setOpen] = useState(false);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const [inTelegram, setInTelegram] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
     setStandalone(isStandalone());
+    setInTelegram(isTelegram());
     try {
       setDismissed(localStorage.getItem(DISMISS_KEY) === '1');
     } catch {
@@ -86,7 +89,8 @@ export function InstallBanner() {
     if (choice.outcome === 'accepted') dismiss();
   };
 
-  if (!ready || standalone || dismissed || platform === 'desktop') return null;
+  // In the Telegram Mini App "add to home screen" is meaningless — never show the banner there.
+  if (!ready || standalone || dismissed || inTelegram || platform === 'desktop') return null;
 
   return (
     <>

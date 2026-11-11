@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { inter, unbounded } from '@/lib/fonts';
 import { Providers } from '@/components/auth/Providers';
 import { PwaSetup } from '@/components/pwa/PwaSetup';
+import { TelegramSetup } from '@/components/pwa/TelegramSetup';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -27,9 +29,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${unbounded.variable} ${inter.variable}`}>
+      <head>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
+      </head>
       <body>
         <Providers appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}>{children}</Providers>
         <PwaSetup />
+        <TelegramSetup />
       </body>
     </html>
   );
