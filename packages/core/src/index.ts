@@ -23,7 +23,7 @@ export {
   getUserStamps,
   getUserConnections,
 } from './reads';
-export { buildScoringInput } from './scoring-input';
+export { buildScoringInput, buildScoringInputs } from './scoring-input';
 export { recompute } from './recompute';
 export { withAdapterRetry, type RetryOptions } from './retry';
 export {
@@ -40,7 +40,13 @@ export {
   createConnectionChallenge,
   consumeConnectionChallenge,
 } from './connections';
-export { validateOfferRule, selectOffers, activateOffer } from './offers';
+export {
+  validateOfferRule,
+  selectOffers,
+  activateOffer,
+  listActiveOffers,
+  type OfferRow,
+} from './offers';
 export { prepareWeek, computeDraft, publishDrop } from './drop';
 export { toPublicPass, type PublicPass } from './public-pass';
 export {

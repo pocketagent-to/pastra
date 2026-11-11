@@ -3,6 +3,14 @@ import type { Axis, Catalog, Condition, ProviderId } from '@pastra/catalog';
 import { AXES } from '@pastra/catalog';
 import type { Database } from '@pastra/db';
 import { offers as offersTable, userOffers } from '@pastra/db';
+
+/** A row of the offers table. */
+export type OfferRow = typeof offersTable.$inferSelect;
+
+/** Load the active offers once (the drop passes the result to selectOffers for every user). */
+export async function listActiveOffers(db: Database): Promise<OfferRow[]> {
+  return db.select().from(offersTable).where(eq(offersTable.active, true));
+}
 import {
   aggregateMetrics,
   computePass,
@@ -94,6 +102,8 @@ export async function selectOffers(
     offersConsent: boolean;
     perUser?: number;
     perAxis?: number;
+    /** Preloaded active offers (the drop loads them once for the whole run instead of per user). */
+    offers?: OfferRow[];
   },
 ): Promise<Array<{ offerId: string; state: 'available' | 'locked' }>> {
   const { userId, week, perUser = 8, perAxis = 3 } = params;
@@ -113,7 +123,8 @@ export async function selectOffers(
     input.rewardedFriends,
   );
 
-  const active = await db.select().from(offersTable).where(eq(offersTable.active, true));
+  const active =
+    params.offers ?? (await db.select().from(offersTable).where(eq(offersTable.active, true)));
 
   const eligible = active
     .filter((o) => {

@@ -25,20 +25,56 @@ function toStampRecord(catalog: Catalog, key: string, tier: number | null): Stam
 }
 
 /**
- * Read everything the pure scorer needs for a user and week from the database and assemble a
- * {@link ScoringInput}. This is the single glue point between storage and scoring.
+ * Read everything the pure scorer needs for a user and week and assemble a {@link ScoringInput}.
+ * This is the single glue point between storage and scoring.
  */
 export async function buildScoringInput(
   db: Database,
   catalog: Catalog,
   params: { userId: string; week: string },
 ): Promise<ScoringInput> {
-  const { userId, week } = params;
+  const map = await buildScoringInputs(db, catalog, { userIds: [params.userId], week: params.week });
+  return map.get(params.userId) ?? emptyInput(params.week);
+}
 
-  const conns = await db.select().from(connections).where(eq(connections.userId, userId));
+function emptyInput(week: string): ScoringInput {
+  return {
+    week,
+    connections: [],
+    rewardedFriends: 0,
+    hasEns: false,
+    hasCard: false,
+    country: undefined,
+    existingStamps: [],
+    peakPoints: 0,
+  };
+}
+
+/**
+ * Batched {@link buildScoringInput} for a chunk of users and one week: loads every table once with
+ * `inArray` and assembles each user's input in memory. The weekly drop uses this to replace ~7
+ * queries per user with ~7 per chunk; results are byte-for-byte identical to the per-user path. A
+ * {@link ScoringInput} is returned for every requested user, even one with no connections.
+ */
+export async function buildScoringInputs(
+  db: Database,
+  catalog: Catalog,
+  params: { userIds: string[]; week: string },
+): Promise<Map<string, ScoringInput>> {
+  const { userIds, week } = params;
+  const out = new Map<string, ScoringInput>();
+  if (userIds.length === 0) return out;
+
+  const conns = await db.select().from(connections).where(inArray(connections.userId, userIds));
   const connIds = conns.map((c) => c.id);
+  const connsByUser = new Map<string, typeof conns>();
+  for (const c of conns) {
+    const bucket = connsByUser.get(c.userId) ?? [];
+    bucket.push(c);
+    connsByUser.set(c.userId, bucket);
+  }
 
-  const [mvs, mes] = await Promise.all([
+  const [mvs, mes, userRows, friends, cards, stampRows] = await Promise.all([
     connIds.length
       ? db
           .select()
@@ -51,6 +87,16 @@ export async function buildScoringInput(
           .from(metricExtras)
           .where(and(inArray(metricExtras.connectionId, connIds), eq(metricExtras.week, week)))
       : Promise.resolve([]),
+    db.select().from(users).where(inArray(users.id, userIds)),
+    db
+      .select()
+      .from(friendships)
+      .where(or(inArray(friendships.userA, userIds), inArray(friendships.userB, userIds))),
+    db.select().from(cardAccounts).where(inArray(cardAccounts.userId, userIds)),
+    db
+      .select()
+      .from(stamps)
+      .where(and(inArray(stamps.userId, userIds), isNull(stamps.revokedAt))),
   ]);
 
   const metricsByConn = new Map<string, Record<string, number | null>>();
@@ -66,42 +112,50 @@ export async function buildScoringInput(
     extrasByConn.set(row.connectionId, bucket);
   }
 
-  const scoringConnections: ScoringConnection[] = conns.map((c) => ({
-    provider: c.provider as ProviderId,
-    status: c.status,
-    staleWeeks: c.staleWeeks,
-    metrics: metricsByConn.get(c.id) ?? {},
-    extras: extrasByConn.get(c.id) ?? {},
-  }));
+  const userById = new Map(userRows.map((u) => [u.id, u]));
+  const cardByUser = new Map(cards.map((c) => [c.userId, c]));
 
-  const [user] = await db.select().from(users).where(eq(users.id, userId));
-  const friends = await db
-    .select()
-    .from(friendships)
-    .where(or(eq(friendships.userA, userId), eq(friendships.userB, userId)));
-  const rewardedFriends = friends.filter((f) => f.source === 'invite' && f.rewarded).length;
+  const wanted = new Set(userIds);
+  const rewardedByUser = new Map<string, number>();
+  for (const f of friends) {
+    if (f.source !== 'invite' || !f.rewarded) continue;
+    if (wanted.has(f.userA)) rewardedByUser.set(f.userA, (rewardedByUser.get(f.userA) ?? 0) + 1);
+    if (wanted.has(f.userB)) rewardedByUser.set(f.userB, (rewardedByUser.get(f.userB) ?? 0) + 1);
+  }
 
-  const [card] = await db.select().from(cardAccounts).where(eq(cardAccounts.userId, userId));
-  const hasCard = card?.cardStatus === 'active' || card?.cardStatus === 'frozen';
+  const stampsByUser = new Map<string, StampRecord[]>();
+  for (const s of stampRows) {
+    const record = toStampRecord(catalog, s.stampKey, s.tier);
+    if (!record) continue;
+    const bucket = stampsByUser.get(s.userId) ?? [];
+    bucket.push(record);
+    stampsByUser.set(s.userId, bucket);
+  }
 
-  const stampRows = await db
-    .select()
-    .from(stamps)
-    .where(and(eq(stamps.userId, userId), isNull(stamps.revokedAt)));
-  const existingStamps = stampRows
-    .map((s) => toStampRecord(catalog, s.stampKey, s.tier))
-    .filter((s): s is StampRecord => s !== null);
+  for (const userId of userIds) {
+    const userConns = connsByUser.get(userId) ?? [];
+    const scoringConnections: ScoringConnection[] = userConns.map((c) => ({
+      provider: c.provider as ProviderId,
+      status: c.status,
+      staleWeeks: c.staleWeeks,
+      metrics: metricsByConn.get(c.id) ?? {},
+      extras: extrasByConn.get(c.id) ?? {},
+    }));
+    const hasEns = userConns.some((c) => (extrasByConn.get(c.id) ?? {}).hasEns === true);
+    const card = cardByUser.get(userId);
+    const user = userById.get(userId);
 
-  const hasEns = mes.some((e) => e.key === 'hasEns' && e.value === true);
+    out.set(userId, {
+      week,
+      connections: scoringConnections,
+      rewardedFriends: rewardedByUser.get(userId) ?? 0,
+      hasEns,
+      hasCard: card?.cardStatus === 'active' || card?.cardStatus === 'frozen',
+      country: user?.country ?? undefined,
+      existingStamps: stampsByUser.get(userId) ?? [],
+      peakPoints: user?.peakPoints ?? 0,
+    });
+  }
 
-  return {
-    week,
-    connections: scoringConnections,
-    rewardedFriends,
-    hasEns,
-    hasCard,
-    country: user?.country ?? undefined,
-    existingStamps,
-    peakPoints: user?.peakPoints ?? 0,
-  };
+  return out;
 }

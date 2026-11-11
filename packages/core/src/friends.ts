@@ -1,8 +1,8 @@
-import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import type { Axis, Catalog } from '@pastra/catalog';
 import { AXES } from '@pastra/catalog';
 import type { Database } from '@pastra/db';
-import { friendships, invites, users } from '@pastra/db';
+import { friendships, invites, passSnapshots, users, visibility } from '@pastra/db';
 import { CoreError } from './errors';
 import { generateFriendCode } from './handles';
 import { currentWeek, getLivePass, getUserByHandle, getVisibility } from './reads';
@@ -194,14 +194,42 @@ export async function getFriendsView(
     .orderBy(desc(friendships.createdAt));
   const friendIds = links.map((row) => (row.userA === userId ? row.userB : row.userA));
 
+  // Batch the friend reads: one query each for users, live passes and visibility (was 3 per friend).
+  const [friendUserRows, friendSnapRows, friendVisRows] = await Promise.all([
+    friendIds.length
+      ? db.select().from(users).where(inArray(users.id, friendIds))
+      : Promise.resolve([]),
+    friendIds.length
+      ? db
+          .select()
+          .from(passSnapshots)
+          .where(
+            and(
+              inArray(passSnapshots.userId, friendIds),
+              eq(passSnapshots.week, week),
+              eq(passSnapshots.state, 'live'),
+            ),
+          )
+      : Promise.resolve([]),
+    friendIds.length
+      ? db.select().from(visibility).where(inArray(visibility.userId, friendIds))
+      : Promise.resolve([]),
+  ]);
+  const friendUserById = new Map(friendUserRows.map((u) => [u.id, u]));
+  const friendSnapByUser = new Map(friendSnapRows.map((s) => [s.userId, s]));
+  const friendVisByUser = new Map<string, typeof friendVisRows>();
+  for (const row of friendVisRows) {
+    const bucket = friendVisByUser.get(row.userId) ?? [];
+    bucket.push(row);
+    friendVisByUser.set(row.userId, bucket);
+  }
+
   const friends: FriendSummary[] = [];
   for (const friendId of friendIds) {
-    const [friendUser] = await db.select().from(users).where(eq(users.id, friendId));
+    const friendUser = friendUserById.get(friendId);
     if (!friendUser || !friendUser.handle) continue;
-    const [snap, vis] = await Promise.all([
-      getLivePass(db, friendId, week),
-      getVisibility(db, friendId),
-    ]);
+    const snap = friendSnapByUser.get(friendId) ?? null;
+    const vis = friendVisByUser.get(friendId) ?? [];
     friends.push({
       handle: friendUser.handle,
       level: snap?.level ?? 1,
@@ -214,14 +242,21 @@ export async function getFriendsView(
     .from(invites)
     .where(and(eq(invites.inviterId, userId), isNull(invites.joinedAt)))
     .orderBy(desc(invites.createdAt));
+  const inviteeIds = inviteRows.map((i) => i.inviteeId).filter((id): id is string => id !== null);
+  const inviteeById = new Map(
+    (inviteeIds.length
+      ? await db
+          .select({ id: users.id, handle: users.handle })
+          .from(users)
+          .where(inArray(users.id, inviteeIds))
+      : []
+    ).map((u) => [u.id, u.handle]),
+  );
   const pending: PendingInvite[] = [];
   for (const invite of inviteRows) {
     if (!invite.inviteeId) continue;
-    const [invitee] = await db
-      .select({ handle: users.handle })
-      .from(users)
-      .where(eq(users.id, invite.inviteeId));
-    if (invitee?.handle) pending.push({ id: invite.id, handle: invitee.handle });
+    const handle = inviteeById.get(invite.inviteeId);
+    if (handle) pending.push({ id: invite.id, handle });
   }
 
   return {
