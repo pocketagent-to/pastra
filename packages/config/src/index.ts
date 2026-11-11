@@ -112,6 +112,24 @@ export const configSchema = z.object({
   WHOOP_CLIENT_SECRET: z.string().default(''),
   OURA_CLIENT_ID: z.string().default(''),
   OURA_CLIENT_SECRET: z.string().default(''),
+
+  // Second wave of live-service adapters.
+  FACEIT_CLIENT_ID: z.string().default(''),
+  FACEIT_CLIENT_SECRET: z.string().default(''),
+  FACEIT_API_KEY: z.string().default(''),
+  BATTLENET_CLIENT_ID: z.string().default(''),
+  BATTLENET_CLIENT_SECRET: z.string().default(''),
+  OSU_CLIENT_ID: z.string().default(''),
+  OSU_CLIENT_SECRET: z.string().default(''),
+  NEYNAR_API_KEY: z.string().default(''),
+  LINKEDIN_CLIENT_ID: z.string().default(''),
+  LINKEDIN_CLIENT_SECRET: z.string().default(''),
+  MYANIMELIST_CLIENT_ID: z.string().default(''),
+  MYANIMELIST_CLIENT_SECRET: z.string().default(''),
+  WITHINGS_CLIENT_ID: z.string().default(''),
+  WITHINGS_CLIENT_SECRET: z.string().default(''),
+  FOURSQUARE_CLIENT_ID: z.string().default(''),
+  FOURSQUARE_CLIENT_SECRET: z.string().default(''),
 });
 
 export type Config = z.infer<typeof configSchema>;
