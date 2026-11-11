@@ -7,8 +7,8 @@ import { cn } from '@/lib/cn';
 /** Tab icons, traced from the mockups (design/Main.html footer). */
 const iconProps = {
   viewBox: '0 0 24 24',
-  width: 22,
-  height: 22,
+  width: 25,
+  height: 25,
   'aria-hidden': true,
   fill: 'none',
   stroke: 'currentColor',
@@ -83,7 +83,7 @@ export function BottomNav() {
               <Link
                 href={href}
                 className={cn(
-                  'flex min-h-14 flex-col items-center justify-center gap-1 pb-1 text-[11px] font-semibold',
+                  'flex min-h-[70px] flex-col items-center justify-center gap-1.5 text-[12px] font-semibold',
                   active ? 'text-orange' : 'text-ink-3',
                 )}
                 aria-current={active ? 'page' : undefined}
