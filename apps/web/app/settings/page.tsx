@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
 import { requireUser } from '@/lib/data';
 import { PreferenceToggle } from './PreferenceToggle';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,14 +118,7 @@ export default async function SettingsScreen() {
             >
               Terms of use
             </Link>
-            <form action="/api/auth/logout" method="post">
-              <button
-                type="submit"
-                className="flex h-[52px] w-full items-center justify-center rounded-button border-[1.5px] border-ink text-[15px] font-semibold"
-              >
-                Log out
-              </button>
-            </form>
+            <LogoutButton privyConfigured={Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID)} />
             <Link
               href="/settings/delete"
               className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-[#FF8A7A] text-[15px] font-semibold text-[#FF8A7A]"
