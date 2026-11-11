@@ -64,9 +64,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* A small breathing gap under the bottom nav so it doesn't sit flush to the edge (web + PWA). */
+.app-bottom-nav {
+  padding-bottom: 14px;
+}
+
 /* Telegram Mini App: its web view is not a standalone PWA, so iOS does not auto-inset it — give the
  * bottom nav home-indicator clearance (Telegram exposes the device inset as a CSS var on Bot API 8+;
- * fall back to a small fixed gap on older clients). The `tg` class is set by TelegramSetup. */
+ * fall back to the base gap on older clients). The `tg` class is set by TelegramSetup. */
 html.tg .app-bottom-nav {
   padding-bottom: max(14px, var(--tg-safe-area-inset-bottom, 0px));
 }
