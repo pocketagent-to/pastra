@@ -1,6 +1,7 @@
 import { catalog } from '@pastra/catalog';
 import { getConfig, directDatabaseUrl, type Config } from '@pastra/config';
 import { TokenCipher } from '@pastra/crypto';
+import { buildRealAdapters } from '@pastra/core';
 import { buildRegistry, type AdapterRegistry } from '@pastra/providers';
 import { createCardProvider, type CardProvider } from '@pastra/card';
 import { MockMailer, MockTelegram, type Mailer, type TelegramClient } from '@pastra/notify';
@@ -27,7 +28,8 @@ export function createDeps(): WorkerDeps {
     db: createDb(directDatabaseUrl(config), 'persistent'),
     catalog,
     cipher: TokenCipher.fromEnv(config.TOKEN_ENC_KEYS),
-    registry: buildRegistry(),
+    // Real adapters when credentials are present, so the weekly drop syncs real data (not stubs).
+    registry: buildRegistry(buildRealAdapters(config)),
     card: createCardProvider({ provider: config.CARD_PROVIDER }),
     mailer: new MockMailer(),
     telegram: new MockTelegram(),

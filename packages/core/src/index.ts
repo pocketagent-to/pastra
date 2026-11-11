@@ -27,6 +27,7 @@ export { buildScoringInput, buildScoringInputs } from './scoring-input';
 export { recompute } from './recompute';
 export { withAdapterRetry, type RetryOptions } from './retry';
 export { pruneExpired, type RetentionResult } from './retention';
+export { buildRealAdapters, providerIsConfigured, liveProviders } from './adapters';
 export {
   createProviderLimiter,
   type ProviderLimiter,
