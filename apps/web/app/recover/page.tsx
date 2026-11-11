@@ -1,7 +1,11 @@
 import Link from 'next/link';
+import { RecoverMethods } from './RecoverMethods';
+
+export const dynamic = 'force-dynamic';
 
 /** A12 · Recover access — sign in with another linked method (docs/product-spec.md section 12). */
 export default function Recover() {
+  const privyConfigured = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
   return (
     <main className="app-shell flex min-h-dvh flex-col">
       <header className="flex items-center gap-3.5 bg-[#16171B] px-5 py-3.5">
@@ -37,54 +41,7 @@ export default function Recover() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2.5">
-          <Link
-            href="/login/email"
-            className="flex min-h-[60px] items-center justify-between rounded-tile bg-panel px-4 py-3"
-          >
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[15px] font-semibold">Email login link</span>
-              <span className="text-[12px] text-ink-3">If you added an email to your pass</span>
-            </span>
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="shrink-0 text-orange"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-          <Link
-            href="/api/auth/google/begin"
-            className="flex min-h-[60px] items-center justify-between rounded-tile bg-panel px-4 py-3"
-          >
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[15px] font-semibold">Google</span>
-              <span className="text-[12px] text-ink-3">If you added Google in Sign-in methods</span>
-            </span>
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="shrink-0 text-orange"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </div>
+        <RecoverMethods privyConfigured={privyConfigured} />
 
         <div className="mt-auto rounded-tile border-[1.5px] border-dashed border-[#6B7080] p-4 text-[13px] leading-relaxed text-ink-2">
           Neither works? Write to [SUPPORT EMAIL]. We&rsquo;ll ask you to prove you own one of the

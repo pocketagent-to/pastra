@@ -1,14 +1,19 @@
 import Link from 'next/link';
 import { catalog } from '@pastra/catalog';
-import { currentWeek, getFriendsView } from '@pastra/core';
+import { createInvite, currentWeek, getFriendsView } from '@pastra/core';
 import { AppShell } from '@/components/layout/AppShell';
 import { requireUser } from '@/lib/data';
 import { getDb } from '@/lib/server';
+import { CopyInviteButton, RemindButton } from './InviteActions';
 
 /** E1 · Friends (docs/product-spec.md section 10). */
 export default async function FriendsScreen() {
   const user = await requireUser();
-  const view = await getFriendsView(getDb(), catalog, user.id, currentWeek());
+  const db = getDb();
+  const view = await getFriendsView(db, catalog, user.id, currentWeek());
+  // Stable, handle-independent invite link backed by the inviter's friend code (invites.ts). The
+  // `[your-domain]` placeholder stays literal until a production domain is decided (architecture §18).
+  const invite = await createInvite(db, user.id);
 
   if (view.empty) {
     return (
@@ -49,14 +54,12 @@ export default async function FriendsScreen() {
 
           <div className="mt-auto flex flex-col gap-2.5">
             <div className="flex h-12 items-center rounded-[14px] bg-panel px-3.5 text-sm text-ink-2">
-              [your-domain]/i/{view.handle}
+              {invite.url}
             </div>
-            <button
-              type="button"
+            <CopyInviteButton
+              link={invite.url}
               className="h-14 w-full rounded-button bg-orange font-head text-sm font-bold uppercase tracking-[0.03em] text-on-orange"
-            >
-              Copy invite link
-            </button>
+            />
             <Link
               href="/share"
               className="flex h-[52px] items-center justify-center rounded-button border-[1.5px] border-white font-head text-[13px] font-bold uppercase tracking-[0.03em] text-ink"
@@ -89,14 +92,12 @@ export default async function FriendsScreen() {
             You both get +5 points when they build a pass.
           </p>
           <div className="flex h-12 items-center rounded-[14px] border border-[#1F2C6B] bg-black px-3.5 text-sm text-ink-2">
-            [your-domain]/i/{view.handle}
+            {invite.url}
           </div>
-          <button
-            type="button"
+          <CopyInviteButton
+            link={invite.url}
             className="h-[52px] w-full rounded-button bg-orange font-head text-[13px] font-bold uppercase tracking-[0.03em] text-on-orange"
-          >
-            Copy invite link
-          </button>
+          />
         </div>
 
         {/* Add a friend by code */}
@@ -176,12 +177,10 @@ export default async function FriendsScreen() {
                   <div className="text-sm font-semibold">{p.handle}</div>
                   <div className="text-xs text-ink-3">Invited, hasn&apos;t joined yet</div>
                 </div>
-                <button
-                  type="button"
-                  className="h-11 rounded-xl border-[1.5px] border-white px-4 text-[13px] font-semibold"
-                >
-                  Remind
-                </button>
+                <RemindButton
+                  inviteId={p.id}
+                  className="h-11 rounded-xl border-[1.5px] border-white px-4 text-[13px] font-semibold disabled:opacity-50"
+                />
               </div>
             ))}
           </section>
