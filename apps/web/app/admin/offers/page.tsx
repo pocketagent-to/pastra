@@ -1,92 +1,23 @@
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { catalog, type Condition } from '@pastra/catalog';
+import { isAdmin, listOffers, type AdminOffer } from '@pastra/core';
+import { getConfig } from '@pastra/config';
+import { requireUser } from '@/lib/data';
+import { getDb } from '@/lib/server';
 
-type Offer = {
-  id: string;
-  merchant: string;
-  offer: string;
-  type: string;
-  side: string;
-  who: string;
-  eligible: string;
-  shown: string;
-  activated: string;
-  used: string;
-  status: string;
-  statusClass: string;
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const SIDE_LABEL: Record<string, string> = {
+  sports: 'Sports',
+  gaming: 'Gaming',
+  crypto: 'Crypto',
+  music: 'Music & Entertainment',
+  social: 'Social',
+  lifestyle: 'Lifestyle',
+  any: 'Any',
 };
-
-const OFFERS: Offer[] = [
-  {
-    id: 'o1',
-    merchant: '[PARTNER A]',
-    offer: '[RATE]% back at skin marketplaces',
-    type: 'Cashback',
-    side: 'Gaming',
-    who: 'Steam connected · CS2 hours 2w ≥ 5',
-    eligible: '[N]',
-    shown: '[N]',
-    activated: '[N]',
-    used: '[N]',
-    status: 'Live',
-    statusClass: 'bg-green',
-  },
-  {
-    id: 'o2',
-    merchant: '[PARTNER B]',
-    offer: '[Early access] to tickets',
-    type: 'Promo · pool',
-    side: 'Music',
-    who: 'Music ≥ 40 · new tracks 30d ≥ 10',
-    eligible: '[N]',
-    shown: '[N]',
-    activated: '[N]',
-    used: '—',
-    status: 'Live',
-    statusClass: 'bg-green',
-  },
-  {
-    id: 'o3',
-    merchant: '[PARTNER C]',
-    offer: '[RATE]% back on every purchase',
-    type: 'Cashback',
-    side: 'Crypto',
-    who: 'Wallet age ≥ 5 yrs · has card',
-    eligible: '[N]',
-    shown: '[N]',
-    activated: '[N]',
-    used: '[N]',
-    status: 'Live',
-    statusClass: 'bg-green',
-  },
-  {
-    id: 'o4',
-    merchant: '[PARTNER D]',
-    offer: '[Discount] on gear',
-    type: 'Promo · shared',
-    side: 'Any',
-    who: 'No conditions',
-    eligible: '[N]',
-    shown: '[N]',
-    activated: '[N]',
-    used: '—',
-    status: 'Next week',
-    statusClass: 'whitespace-nowrap bg-orange-light',
-  },
-  {
-    id: 'o5',
-    merchant: '[PARTNER E]',
-    offer: '[Discount] on flights',
-    type: 'Promo · pool',
-    side: 'Lifestyle',
-    who: 'Countries ≥ 5',
-    eligible: '[N]',
-    shown: '[N]',
-    activated: '[N]',
-    used: '—',
-    status: 'Codes out',
-    statusClass: 'whitespace-nowrap bg-[#FF8A7A]',
-  },
-];
 
 const COLUMNS = [
   'Merchant',
@@ -101,6 +32,48 @@ const COLUMNS = [
   'Status',
   '',
 ];
+
+function typeLabel(offer: AdminOffer): string {
+  if (offer.type === 'cashback') return 'Cashback';
+  return offer.codeMode ? `Promo · ${offer.codeMode}` : 'Promo';
+}
+
+function describeCondition(condition: Condition): string {
+  switch (condition.kind) {
+    case 'connected': {
+      const provider = catalog.providerById.get(condition.provider);
+      return `${provider?.name ?? condition.provider} connected`;
+    }
+    case 'metric_gte': {
+      const metric = catalog.metricById.get(condition.metric);
+      return `${metric?.label ?? condition.metric} ≥ ${condition.value}`;
+    }
+    case 'axis_gte':
+      return `${SIDE_LABEL[condition.axis] ?? condition.axis} ≥ ${condition.value}`;
+    case 'level_gte':
+      return `Level ≥ ${condition.value}`;
+    case 'country_in':
+      return `Country in ${condition.countries.join(', ')}`;
+    case 'has_card':
+      return 'Has card';
+    case 'all_axes_positive':
+      return 'All sides > 0';
+    case 'rewarded_friends_gte':
+      return `Friends ≥ ${condition.value}`;
+    case 'all':
+      return condition.of.map(describeCondition).join(' · ');
+    case 'any':
+      return condition.of.map(describeCondition).join(' or ');
+    default:
+      return '';
+  }
+}
+
+function whoLabel(offer: AdminOffer): string {
+  const conditions = offer.rule?.all ?? [];
+  if (conditions.length === 0) return 'No conditions';
+  return conditions.map(describeCondition).join(' · ');
+}
 
 function AdminHeader() {
   return (
@@ -162,7 +135,12 @@ function AdminHeader() {
 }
 
 /** Admin — offers list with stats (docs/product-spec.md section 10; access via ADMIN_USERS). */
-export default function AdminOffers() {
+export default async function AdminOffers() {
+  const user = await requireUser();
+  if (!isAdmin(getConfig(), user)) notFound();
+
+  const offers = await listOffers(getDb());
+
   return (
     <div className="flex min-h-dvh flex-col bg-[#0B0C10] text-ink">
       <AdminHeader />
@@ -203,40 +181,42 @@ export default function AdminOffers() {
             </tr>
           </thead>
           <tbody>
-            {OFFERS.map((o) => (
+            {offers.map((o) => (
               <tr key={o.id}>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm font-semibold">
-                  {o.merchant}
+                  {o.merchantName}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm font-semibold">
-                  {o.offer}
+                  {o.headline}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.type}
+                  {typeLabel(o)}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.side}
+                  {SIDE_LABEL[o.axis] ?? o.axis}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.who}
+                  {whoLabel(o)}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.eligible}
+                  [N]
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.shown}
+                  [N]
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.activated}
+                  [N]
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
-                  {o.used}
+                  {o.type === 'cashback' ? '[N]' : '—'}
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm text-ink-2">
                   <span
-                    className={`rounded-lg px-2.5 py-1 text-xs font-bold text-on-orange ${o.statusClass}`}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-bold ${
+                      o.active ? 'bg-green text-on-orange' : 'bg-divider text-ink-2'
+                    }`}
                   >
-                    {o.status}
+                    {o.active ? 'Live' : 'Off'}
                   </span>
                 </td>
                 <td className="border-b border-divider px-3.5 py-3.5 align-middle text-sm">
