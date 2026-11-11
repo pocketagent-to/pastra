@@ -22,6 +22,15 @@ import {
   createWhoopAdapter,
   createXAdapter,
   createYouTubeAdapter,
+  createFaceitAdapter,
+  createBattlenetAdapter,
+  createOsuAdapter,
+  createTelegramAdapter,
+  createFarcasterAdapter,
+  createLinkedinAdapter,
+  createMyAnimeListAdapter,
+  createWithingsAdapter,
+  createFoursquareAdapter,
   type ProviderAdapter,
 } from '@pastra/providers';
 import { createDb, type Database } from '@pastra/db';
@@ -70,6 +79,24 @@ function providerIsConfigured(id: ProviderId, c: Config): boolean {
       return Boolean(c.HELIUS_KEY);
     case 'wallet_ton':
       return Boolean(c.TONAPI_KEY);
+    case 'faceit':
+      return Boolean(c.FACEIT_CLIENT_ID && c.FACEIT_CLIENT_SECRET && c.FACEIT_API_KEY);
+    case 'battlenet':
+      return pair(c.BATTLENET_CLIENT_ID, c.BATTLENET_CLIENT_SECRET);
+    case 'osu':
+      return pair(c.OSU_CLIENT_ID, c.OSU_CLIENT_SECRET);
+    case 'telegram':
+      return Boolean(c.TELEGRAM_BOT_TOKEN);
+    case 'farcaster':
+      return Boolean(c.NEYNAR_API_KEY);
+    case 'linkedin':
+      return pair(c.LINKEDIN_CLIENT_ID, c.LINKEDIN_CLIENT_SECRET);
+    case 'myanimelist':
+      return pair(c.MYANIMELIST_CLIENT_ID, c.MYANIMELIST_CLIENT_SECRET);
+    case 'withings':
+      return pair(c.WITHINGS_CLIENT_ID, c.WITHINGS_CLIENT_SECRET);
+    case 'foursquare':
+      return pair(c.FOURSQUARE_CLIENT_ID, c.FOURSQUARE_CLIENT_SECRET);
     default:
       return false;
   }
@@ -173,6 +200,44 @@ function buildRealAdapters(c: Config): Partial<Record<ProviderId, ProviderAdapte
     real.wallet_ton = createTonWalletAdapter({
       domain,
       indexer: createTonapiIndexer({ apiKey: c.TONAPI_KEY }),
+    });
+
+  if (c.FACEIT_CLIENT_ID && c.FACEIT_CLIENT_SECRET && c.FACEIT_API_KEY)
+    real.faceit = createFaceitAdapter({
+      clientId: c.FACEIT_CLIENT_ID,
+      clientSecret: c.FACEIT_CLIENT_SECRET,
+      dataApiKey: c.FACEIT_API_KEY,
+    });
+  if (c.BATTLENET_CLIENT_ID && c.BATTLENET_CLIENT_SECRET)
+    real.battlenet = createBattlenetAdapter({
+      clientId: c.BATTLENET_CLIENT_ID,
+      clientSecret: c.BATTLENET_CLIENT_SECRET,
+    });
+  if (c.OSU_CLIENT_ID && c.OSU_CLIENT_SECRET)
+    real.osu = createOsuAdapter({ clientId: c.OSU_CLIENT_ID, clientSecret: c.OSU_CLIENT_SECRET });
+  if (c.TELEGRAM_BOT_TOKEN)
+    real.telegram = createTelegramAdapter({ botToken: c.TELEGRAM_BOT_TOKEN });
+  if (c.NEYNAR_API_KEY)
+    real.farcaster = createFarcasterAdapter({ neynarApiKey: c.NEYNAR_API_KEY, domain });
+  if (c.LINKEDIN_CLIENT_ID && c.LINKEDIN_CLIENT_SECRET)
+    real.linkedin = createLinkedinAdapter({
+      clientId: c.LINKEDIN_CLIENT_ID,
+      clientSecret: c.LINKEDIN_CLIENT_SECRET,
+    });
+  if (c.MYANIMELIST_CLIENT_ID && c.MYANIMELIST_CLIENT_SECRET)
+    real.myanimelist = createMyAnimeListAdapter({
+      clientId: c.MYANIMELIST_CLIENT_ID,
+      clientSecret: c.MYANIMELIST_CLIENT_SECRET,
+    });
+  if (c.WITHINGS_CLIENT_ID && c.WITHINGS_CLIENT_SECRET)
+    real.withings = createWithingsAdapter({
+      clientId: c.WITHINGS_CLIENT_ID,
+      clientSecret: c.WITHINGS_CLIENT_SECRET,
+    });
+  if (c.FOURSQUARE_CLIENT_ID && c.FOURSQUARE_CLIENT_SECRET)
+    real.foursquare = createFoursquareAdapter({
+      clientId: c.FOURSQUARE_CLIENT_ID,
+      clientSecret: c.FOURSQUARE_CLIENT_SECRET,
     });
   return real;
 }

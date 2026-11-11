@@ -42,3 +42,12 @@ export { createTonWalletAdapter, type TonIndexer, type TonWalletData } from './a
 export { createAlchemyEvmIndexer } from './indexers/alchemy';
 export { createHeliusSolanaIndexer } from './indexers/helius';
 export { createTonapiIndexer } from './indexers/tonapi';
+export { createFaceitAdapter, type FaceitAdapterConfig } from './adapters/faceit';
+export { createBattlenetAdapter, type BattlenetConfig } from './adapters/battlenet';
+export { createOsuAdapter, type OsuAdapterConfig } from './adapters/osu';
+export { createTelegramAdapter, type TelegramAdapterConfig } from './adapters/telegram';
+export { createFarcasterAdapter, type FarcasterAdapterConfig } from './adapters/farcaster';
+export { createLinkedinAdapter, type LinkedinAdapterConfig } from './adapters/linkedin';
+export { createMyAnimeListAdapter, type MyAnimeListAdapterConfig } from './adapters/myAnimeList';
+export { createWithingsAdapter, type WithingsAdapterConfig } from './adapters/withings';
+export { createFoursquareAdapter, type FoursquareAdapterConfig } from './adapters/foursquare';
