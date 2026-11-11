@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { Toggle } from '@/components/ui/Toggle';
 
@@ -38,6 +38,7 @@ export function ShareClient({ handle }: { handle: string }) {
   });
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imgLoading, setImgLoading] = useState(true);
 
   const safeHandle = handle || 'nomad';
   const imgSrc = useMemo(() => {
@@ -45,6 +46,9 @@ export function ShareClient({ handle }: { handle: string }) {
     return `/og/${encodeURIComponent(safeHandle)}.png?v=${format}&show=${flags || 'none'}`;
   }, [show, format, safeHandle]);
   const ratio = FORMATS.find((f) => f.key === format)!.ratio;
+
+  // Show the shimmer again whenever the card we need to render changes.
+  useEffect(() => setImgLoading(true), [imgSrc]);
 
   const publicUrl = () =>
     typeof window === 'undefined' ? '' : `${window.location.origin}/${safeHandle}`;
@@ -94,15 +98,22 @@ export function ShareClient({ handle }: { handle: string }) {
   return (
     <div className="flex flex-1 flex-col gap-[22px] pt-2">
       <div
-        className="mx-auto w-full max-w-full overflow-hidden rounded-[20px] border border-divider bg-black"
+        className="relative mx-auto w-full max-w-full overflow-hidden rounded-[20px] border border-divider bg-black"
         style={{ aspectRatio: ratio, maxHeight: '52vh' }}
       >
+        {/* Shimmer while the card renders server-side (satori), so there's no half-drawn flash. */}
+        {imgLoading && <div className="skeleton absolute inset-0" aria-hidden />}
         {/* The real share card is generated at /og/{handle}.png; key forces a reload on change. */}
         <img
           key={imgSrc}
           src={imgSrc}
           alt="Share preview"
-          className="h-full w-full object-contain"
+          onLoad={() => setImgLoading(false)}
+          onError={() => setImgLoading(false)}
+          className={cn(
+            'h-full w-full object-contain transition-opacity duration-200',
+            imgLoading ? 'opacity-0' : 'opacity-100',
+          )}
         />
       </div>
 
