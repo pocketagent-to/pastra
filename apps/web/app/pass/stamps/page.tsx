@@ -1,18 +1,10 @@
 import { AppShell } from '@/components/layout/AppShell';
 import { cn } from '@/lib/cn';
+import { getStampsView } from '@pastra/core';
+import { requireUser } from '@/lib/data';
+import { coreDeps } from '@/lib/server';
 
-const YOURS: Array<{ axis: string; name: string; meta: string }> = [
-  { axis: 'Crypto', name: 'In crypto since 2019', meta: 'Week 41' },
-  { axis: 'Gaming', name: '2,000+ hours', meta: 'Week 46 · new' },
-  { axis: 'Crypto', name: 'Collector', meta: 'Week 43' },
-];
-
-const NEXT: Array<{ axis: string; name: string; meta: string }> = [
-  { axis: 'Sports', name: 'Marathoner', meta: '12 active weeks in a row' },
-  { axis: 'Lifestyle', name: 'Traveler', meta: 'Check in across 10 countries' },
-  { axis: 'Music', name: 'Explorer', meta: '500 artists in your collection' },
-  { axis: 'All sides', name: 'Full hexagon', meta: 'Fill all six sides' },
-];
+export const dynamic = 'force-dynamic';
 
 function StampCard({
   axis,
@@ -22,7 +14,7 @@ function StampCard({
 }: {
   axis: string;
   name: string;
-  meta: string;
+  meta?: string;
   earned: boolean;
 }) {
   return (
@@ -48,42 +40,62 @@ function StampCard({
       >
         {name}
       </div>
-      <div className="text-xs text-ink-3">{meta}</div>
+      {meta ? <div className="text-xs text-ink-3">{meta}</div> : null}
     </div>
   );
 }
 
 /** B5 · Stamps — earned and "next to earn" (docs/product-spec.md section 12). */
-export default function Stamps() {
+export default async function Stamps() {
+  const user = await requireUser();
+  const { db, catalog } = coreDeps();
+  const { collected, nextToEarn } = await getStampsView(db, catalog, user.id);
+
   return (
     <AppShell back="/pass" title="Stamps">
       <div className="flex flex-col gap-[22px] pt-2">
         <div className="flex flex-col gap-1.5">
           <div className="font-head text-[26px] font-extrabold uppercase">
-            {YOURS.length} collected
+            {collected.length} collected
           </div>
           <div className="text-sm text-ink-2">New stamps arrive with the weekly drop.</div>
         </div>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">Yours</h2>
-          <div className="grid grid-cols-2 gap-2.5">
-            {YOURS.map((s) => (
-              <StampCard key={s.name} axis={s.axis} name={s.name} meta={s.meta} earned />
-            ))}
-          </div>
-        </section>
+        {collected.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h2 className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">Yours</h2>
+            <div className="grid grid-cols-2 gap-2.5">
+              {collected.map((s, i) => (
+                <StampCard
+                  key={`${s.axis}-${s.name}-${i}`}
+                  axis={s.axis}
+                  name={s.name}
+                  meta={s.meta}
+                  earned
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <section className="flex flex-col gap-3">
-          <h2 className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">
-            Next to earn
-          </h2>
-          <div className="grid grid-cols-2 gap-2.5">
-            {NEXT.map((s) => (
-              <StampCard key={s.name} axis={s.axis} name={s.name} meta={s.meta} earned={false} />
-            ))}
-          </div>
-        </section>
+        {nextToEarn.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h2 className="font-head text-[13px] font-bold uppercase tracking-[0.05em]">
+              Next to earn
+            </h2>
+            <div className="grid grid-cols-2 gap-2.5">
+              {nextToEarn.map((s, i) => (
+                <StampCard
+                  key={`${s.axis}-${s.name}-${i}`}
+                  axis={s.axis}
+                  name={s.name}
+                  meta={s.meta}
+                  earned={false}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </AppShell>
   );

@@ -4,15 +4,15 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PromoCode } from '@/components/ui/PromoCode';
 import { AXIS_SHORT } from '@/lib/axes';
 import { requireUser } from '@/lib/data';
-import { EXAMPLE_OFFERS } from '@/lib/example';
+import { getOfferDetail } from '@/lib/offers';
 
 export const dynamic = 'force-dynamic';
 
 /** D4 / D5 · Offer detail — promo code or cashback (docs/product-spec.md section 12). */
 export default async function OfferDetail({ params }: { params: Promise<{ id: string }> }) {
-  await requireUser();
+  const user = await requireUser();
   const { id } = await params;
-  const offer = EXAMPLE_OFFERS.find((o) => o.id === id);
+  const offer = await getOfferDetail(user.id, id);
   if (!offer) notFound();
 
   const badge = AXIS_SHORT[offer.axis];
@@ -33,20 +33,20 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
             )}
           </div>
 
-          <PromoCode code="[PROMO-CODE]" variant="box" />
+          <PromoCode code={offer.code} variant="box" />
 
           <div className="flex flex-col rounded-panel bg-panel px-4 py-1">
             <div className="flex min-h-12 items-center text-sm">
               <span className="flex-1 text-ink-2">Partner</span>
-              <span className="font-semibold">[PARTNER]</span>
+              <span className="font-semibold">{offer.partner}</span>
             </div>
             <div className="flex min-h-12 items-center border-t border-divider text-sm">
               <span className="flex-1 text-ink-2">Valid until</span>
-              <span className="font-semibold">Next drop · 2 days</span>
+              <span className="font-semibold">{offer.validUntil}</span>
             </div>
             <div className="flex min-h-12 items-center border-t border-divider text-sm">
               <span className="flex-1 text-ink-2">Terms</span>
-              <span className="font-semibold">[OFFER TERMS]</span>
+              <span className="font-semibold">{offer.terms}</span>
             </div>
           </div>
 
@@ -86,11 +86,11 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
           </div>
           <div className="flex min-h-[52px] items-center justify-between gap-3 border-t border-divider text-sm">
             <span className="text-ink-2">Where</span>
-            <span className="text-right font-semibold">[PARTNER]</span>
+            <span className="text-right font-semibold">{offer.partner}</span>
           </div>
           <div className="flex min-h-[52px] items-center justify-between gap-3 border-t border-divider text-sm">
             <span className="text-ink-2">Valid until</span>
-            <span className="text-right font-semibold">Next drop · 2 days</span>
+            <span className="text-right font-semibold">{offer.validUntil}</span>
           </div>
           <div className="flex min-h-[52px] items-center justify-between gap-3 border-t border-divider text-sm">
             <span className="text-ink-2">Cashback limit</span>
@@ -116,7 +116,7 @@ export default async function OfferDetail({ params }: { params: Promise<{ id: st
           ))}
         </div>
 
-        <p className="text-[13px] leading-relaxed text-ink-3">[OFFER TERMS]</p>
+        <p className="text-[13px] leading-relaxed text-ink-3">{offer.terms}</p>
 
         <div className="mt-auto flex flex-col gap-2.5">
           <Link

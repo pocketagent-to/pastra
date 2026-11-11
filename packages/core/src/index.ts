@@ -36,3 +36,32 @@ export {
 export { validateOfferRule, selectOffers, activateOffer } from './offers';
 export { prepareWeek, computeDraft, publishDrop } from './drop';
 export { toPublicPass, type PublicPass } from './public-pass';
+export {
+  getOffersView,
+  getOfferView,
+  type OfferCardView,
+  type OfferDetailView,
+  type OfferState,
+  type OfferType,
+} from './offers-view';
+export {
+  getStampsView,
+  getRecapView,
+  type StampCard,
+  type StampsView,
+  type RecapAxisDelta,
+  type RecapView,
+} from './pass-extras';
+export {
+  ensureFriendCode,
+  getFriendsView,
+  addFriendByCode,
+  getFriendProfile,
+  compareFriends,
+  type FriendSummary,
+  type PendingInvite,
+  type FriendsView,
+  type FriendProfileView,
+  type CompareSide,
+  type CompareView,
+} from './friends';
