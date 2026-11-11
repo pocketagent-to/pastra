@@ -106,8 +106,8 @@ export function Hexagon({
             key={r}
             points={ringPolygon(r)}
             fill="none"
-            stroke={outer ? '#3A3D47' : '#2A2C34'}
-            strokeWidth={1}
+            stroke={outer ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.15)'}
+            strokeWidth={outer ? 1.25 : 1}
           />
         );
       })}
@@ -122,7 +122,7 @@ export function Hexagon({
             y1={0}
             x2={outer.x}
             y2={outer.y}
-            stroke="#2A2C34"
+            stroke="rgba(255,255,255,0.12)"
             strokeWidth={1}
           />
         );
@@ -142,9 +142,9 @@ export function Hexagon({
           <polygon
             points={hexPolygon(primary)}
             fill="url(#hexfill)"
-            fillOpacity={0.6}
+            fillOpacity={0.72}
             stroke="#FFFFFF"
-            strokeWidth={2}
+            strokeWidth={2.25}
             strokeLinejoin="round"
           />
         ))}
