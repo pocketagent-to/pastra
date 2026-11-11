@@ -88,7 +88,16 @@ export async function publishDrop(
   }
 
   await db.transaction(async (tx) => {
-    // Idempotent promote: drop any existing live snapshot for this week, then flip the drafts live.
+    // Guard the promote with the week status so a retried/duplicate publish is a no-op: only the
+    // first run (status still 'preparing') claims the week and flips drafts live. Without this a
+    // second run would delete the live snapshots and find no drafts to promote, wiping the week.
+    const claimed = await tx
+      .update(weeks)
+      .set({ status: 'live' })
+      .where(and(eq(weeks.week, week), eq(weeks.status, 'preparing')))
+      .returning({ week: weeks.week });
+    if (claimed.length === 0) return; // already published; recaps are still (re)built idempotently below
+
     await tx
       .delete(passSnapshots)
       .where(and(eq(passSnapshots.week, week), eq(passSnapshots.state, 'live')));
@@ -103,14 +112,15 @@ export async function publishDrop(
         .set({ state: 'expired' })
         .where(and(eq(userOffers.week, prevWeek), ne(userOffers.state, 'expired')));
     }
-    await tx.update(weeks).set({ status: 'live' }).where(eq(weeks.week, week));
   });
 
   for (const userId of userIds) {
     const result = await recompute(db, catalog, { userId, week, state: 'live' });
     const prev = prevByUser.get(userId);
+    // Idempotent per (user, week) so a retry never duplicates a recap.
     await db
       .insert(recaps)
-      .values({ userId, week, payload: buildRecapPayload(prev?.level, result, prev?.axes) });
+      .values({ userId, week, payload: buildRecapPayload(prev?.level, result, prev?.axes) })
+      .onConflictDoNothing({ target: [recaps.userId, recaps.week] });
   }
 }

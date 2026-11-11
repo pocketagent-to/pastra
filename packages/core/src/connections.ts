@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, gt, isNull } from 'drizzle-orm';
 import type { Catalog, ProviderId } from '@pastra/catalog';
 import type { Database } from '@pastra/db';
 import { connections, loginChallenges, metricExtras, metricValues, syncRuns } from '@pastra/db';
@@ -240,13 +240,21 @@ export async function consumeConnectionChallenge(
   db: Database,
   state: string,
 ): Promise<{ userId: string; provider: ProviderId; nonce?: string; codeVerifier?: string } | null> {
+  // Atomic single-use consume: one UPDATE claims the row (used_at IS NULL + not expired), so two
+  // concurrent callbacks for the same `state` (provider double-POST, double-click) cannot both pass.
   const [row] = await db
-    .select()
-    .from(loginChallenges)
-    .where(eq(loginChallenges.valueHash, sha256(state)));
-  if (!row || row.usedAt || row.kind !== 'oauth_state') return null;
-  if (row.expiresAt.getTime() < Date.now()) return null;
-  await db.update(loginChallenges).set({ usedAt: new Date() }).where(eq(loginChallenges.id, row.id));
+    .update(loginChallenges)
+    .set({ usedAt: new Date() })
+    .where(
+      and(
+        eq(loginChallenges.valueHash, sha256(state)),
+        eq(loginChallenges.kind, 'oauth_state'),
+        isNull(loginChallenges.usedAt),
+        gt(loginChallenges.expiresAt, new Date()),
+      ),
+    )
+    .returning();
+  if (!row) return null;
   const p = (row.payload ?? {}) as Record<string, unknown>;
   if (typeof p.userId !== 'string' || typeof p.provider !== 'string') return null;
   return {

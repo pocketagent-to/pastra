@@ -15,6 +15,13 @@
       "when": 1794413149912,
       "tag": "0001_graceful_carlie_cooper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794413294268,
+      "tag": "0002_curly_the_call",
+      "breakpoints": true
     }
   ]
 }

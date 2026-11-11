@@ -17,6 +17,8 @@ import { createTestDb } from '@pastra/db/testing';
 import {
   completeConnection,
   computeDraft,
+  consumeConnectionChallenge,
+  createConnectionChallenge,
   disconnect,
   disconnectPreview,
   isoWeekString,
@@ -228,6 +230,60 @@ describe('weekly drop (docs/product-spec.md section 7)', () => {
     ).toHaveLength(1);
     const [prevWeekRow] = await db.select().from(weeks).where(eq(weeks.week, WEEK));
     expect(prevWeekRow!.status).toBe('closed');
+  });
+
+  it('publishes idempotently: a retried publish keeps live snapshots and does not duplicate recaps', async () => {
+    const userId = await newUser('dropper2');
+    const w1 = '2026-W48';
+    const w2 = '2026-W49';
+    await completeConnection(deps(), {
+      userId,
+      provider: 'steam',
+      week: w1,
+      params: { code: 'd2' },
+      state: 's2',
+    });
+    await prepareWeek(db, { week: w1, dropAt: new Date('2026-11-30T12:00:00Z') });
+    const cid = await connectionId(userId, 'steam');
+    await syncConnection(deps(), { connectionId: cid, week: w2 });
+    await computeDraft(db, catalog, { week: w2, userIds: [userId] });
+    await prepareWeek(db, { week: w2, dropAt: new Date('2026-12-07T12:00:00Z') });
+
+    await publishDrop(db, catalog, { week: w2, prevWeek: w1, userIds: [userId] });
+    // A duplicate / retried publish must be a no-op, never a wipe of the live snapshots.
+    await publishDrop(db, catalog, { week: w2, prevWeek: w1, userIds: [userId] });
+
+    const live = await db
+      .select()
+      .from(passSnapshots)
+      .where(
+        and(
+          eq(passSnapshots.userId, userId),
+          eq(passSnapshots.week, w2),
+          eq(passSnapshots.state, 'live'),
+        ),
+      );
+    expect(live).toHaveLength(1);
+    expect(
+      await db
+        .select()
+        .from(recaps)
+        .where(and(eq(recaps.userId, userId), eq(recaps.week, w2))),
+    ).toHaveLength(1);
+  });
+});
+
+describe('connection challenges (docs/architecture.md section 7)', () => {
+  it('consumes a challenge exactly once (atomic single-use)', async () => {
+    const userId = await newUser('challenger');
+    const { state } = await createConnectionChallenge(db, { userId, provider: 'github' });
+
+    const first = await consumeConnectionChallenge(db, state);
+    expect(first).toMatchObject({ userId, provider: 'github' });
+    // A second (concurrent/duplicate) consume of the same state must fail.
+    expect(await consumeConnectionChallenge(db, state)).toBeNull();
+    // An unknown state is rejected too.
+    expect(await consumeConnectionChallenge(db, 'not-a-real-state')).toBeNull();
   });
 });
 

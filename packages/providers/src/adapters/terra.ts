@@ -136,14 +136,28 @@ export function createTerraAdapter(cfg: TerraAdapterConfig): ProviderAdapter {
   };
 }
 
+/** Default replay window: reject signed deliveries whose timestamp is older/newer than this. */
+const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+
+/** Absolute age of a signature timestamp in seconds, accepting a seconds- or ms-epoch; null if unparseable. */
+function signatureAgeSeconds(t: string): number | null {
+  const n = Number(t);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const seconds = n > 1e12 ? n / 1000 : n;
+  return Math.abs(Date.now() / 1000 - seconds);
+}
+
 /**
  * Verify a Terra webhook signature (header `terra-signature: t=<ts>,v1=<hmac>`), HMAC-SHA256 of
- * `"<t>.<rawBody>"` with the signing secret. Returns true when it matches.
+ * `"<t>.<rawBody>"` with the signing secret. Returns true when it matches and the timestamp is
+ * within `toleranceSeconds` (replay guard). The age check is skipped when `t` is not a sane epoch,
+ * so a timestamp-unit surprise can never reject a genuine delivery — it only adds protection.
  */
 export function verifyTerraSignature(
   rawBody: string,
   signatureHeader: string | null,
   signingSecret: string,
+  toleranceSeconds: number = SIGNATURE_TOLERANCE_SECONDS,
 ): boolean {
   if (!signatureHeader || !signingSecret) return false;
   const parts = Object.fromEntries(
@@ -155,6 +169,8 @@ export function verifyTerraSignature(
   const t = parts.t;
   const v1 = parts.v1;
   if (!t || !v1) return false;
+  const age = signatureAgeSeconds(t);
+  if (age !== null && age > toleranceSeconds) return false;
   const expected = createHmac('sha256', signingSecret).update(`${t}.${rawBody}`).digest('hex');
   try {
     return timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(v1, 'hex'));

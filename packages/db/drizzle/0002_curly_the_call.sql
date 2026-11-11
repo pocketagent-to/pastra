@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "recaps_user_week_idx" ON "recaps" USING btree ("user_id","week");

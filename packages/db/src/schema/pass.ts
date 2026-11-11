@@ -7,6 +7,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { createdAt, pk, ref } from './ids';
 
@@ -60,14 +61,20 @@ export const stamps = pgTable(
 );
 
 /** Weekly recap, assembled at the drop from two adjacent snapshots. */
-export const recaps = pgTable('recaps', {
-  id: pk(),
-  userId: ref('user_id').notNull(),
-  week: text('week').notNull(),
-  payload: jsonb('payload').$type<Record<string, unknown>>().notNull(),
-  seenAt: timestamp('seen_at', { withTimezone: true }),
-  createdAt: createdAt(),
-});
+export const recaps = pgTable(
+  'recaps',
+  {
+    id: pk(),
+    userId: ref('user_id').notNull(),
+    week: text('week').notNull(),
+    payload: jsonb('payload').$type<Record<string, unknown>>().notNull(),
+    seenAt: timestamp('seen_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  // One recap per user per week: makes the publish recap insert idempotent and serves the read
+  // (userId, week <= X order by week desc).
+  (t) => [uniqueIndex('recaps_user_week_idx').on(t.userId, t.week)],
+);
 
 /** Per-axis visibility: everyone / friends / me. Sports defaults to `me` (10 Nov change). */
 export const visibility = pgTable(
