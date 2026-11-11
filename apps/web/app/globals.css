@@ -50,6 +50,9 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  /* No document-level rubber-band: the app shell owns a single-screen frame and scrolls only its
+   * content area, so a pull never reveals the background behind a fixed header/footer. */
+  overscroll-behavior: none;
 }
 
 body {

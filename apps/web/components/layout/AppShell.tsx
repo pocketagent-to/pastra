@@ -22,10 +22,17 @@ export function AppShell({
   className?: string;
 }) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <InstallBanner />
       {tab ? <AppHeader /> : <BackHeader title={title ?? ''} back={back} />}
-      <main className={cn('app-shell flex-1 px-4 pb-6', className)}>{children}</main>
+      <main
+        className={cn(
+          'app-shell min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6',
+          className,
+        )}
+      >
+        {children}
+      </main>
       {tab && <BottomNav />}
     </div>
   );
