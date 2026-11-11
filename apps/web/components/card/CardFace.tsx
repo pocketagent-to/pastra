@@ -35,7 +35,12 @@ export function CardFace({
       style={{ background: frozen ? '#2a2c34' : 'var(--grad-card)' }}
     >
       <div className="flex items-start justify-between">
-        <img src="/brand/pastra-mark-on-card.svg" alt="Hextra" width={36} height={36} />
+        <div className="flex items-center gap-2">
+          <img src="/brand/pastra-mark-on-card.svg" alt="" width={34} height={34} />
+          <span className="font-head text-base font-extrabold uppercase tracking-[0.06em]">
+            HEXTRA
+          </span>
+        </div>
         <span className="text-xs font-semibold uppercase tracking-widest opacity-90">
           {RARITY_LABEL[rarity]}
         </span>

@@ -3,6 +3,9 @@ import { AppShell } from '@/components/layout/AppShell';
 import { CardFace } from '@/components/card/CardFace';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { EXAMPLE_CARD, EXAMPLE_PASS } from '@/lib/example';
+import { requireUser } from '@/lib/data';
+
+export const dynamic = 'force-dynamic';
 
 const ACTIONS = [
   { href: '/card/top-up', label: 'Top up' },
@@ -12,13 +15,14 @@ const ACTIONS = [
 ];
 
 /** F5 · Card — active (docs/product-spec.md section 9). */
-export default function CardScreen() {
+export default async function CardScreen() {
+  const user = await requireUser();
   const card = EXAMPLE_CARD;
   return (
     <AppShell tab>
       <div className="space-y-5 pt-2">
         <CardFace
-          name={EXAMPLE_PASS.handle}
+          name={user.handle ?? EXAMPLE_PASS.handle}
           level={EXAMPLE_PASS.level}
           rarity={EXAMPLE_PASS.rarity}
           last4={card.last4}
