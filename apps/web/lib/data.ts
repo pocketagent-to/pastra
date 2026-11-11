@@ -55,6 +55,19 @@ function stampLabel(key: string, tier: number | null): { label: string; axis: Ax
   return { label: spec.label, axis: spec.axis };
 }
 
+/**
+ * Just the card-face fields for a signed-in user (handle, level, rarity). A lean read for screens
+ * that only need the card head — avoids getPassView's visibility/stamps/drop assembly.
+ */
+export async function getCardFace(user: {
+  id: string;
+  handle: string | null;
+}): Promise<{ handle: string; level: number; rarity: Rarity }> {
+  const snapshot = await getLivePass(getDb(), user.id, currentWeek());
+  const level = snapshot?.level ?? 1;
+  return { handle: user.handle ?? '', level, rarity: computeRarity(level) };
+}
+
 /** Build the Pass view for a signed-in user from the live snapshot (empty if none yet). */
 export async function getPassView(user: {
   id: string;
